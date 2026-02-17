@@ -1,0 +1,16 @@
+[
+  {
+    "id": "30a65c99-f58f-80de-95f4-de52c16d121e",
+    "title": "Example",
+    "slug": "example",
+    "date": "2026-02-17",
+    "readTime": "5 mins",
+    "description": "example blog post for testing out api",
+    "tags": [
+      "hello",
+      "tag1",
+      "tag2"
+    ],
+    "color": "bg-[#fff06b]"
+  }
+]

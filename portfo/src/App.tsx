@@ -1,34 +1,28 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import AboutMe from './pages/About'
+import Experience from './pages/Experience'
+import Projects from './pages/Projects'
+import Writing from './pages/Writing'
+import PostDetail from './pages/PostDetail'
+import Navbar from './components/Navbar'
+import { Routes, Route } from 'react-router-dom'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      <Navbar />      
+      <Routes>
+        <Route path="/" element={<AboutMe />} />
+        <Route path="/experience" element={<Experience />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/writing" element={<Writing />} />
+        <Route path="/writing/:slug" element={<PostDetail />} />
+        
+        {/* 404 Catch-all */}
+        <Route path="*" element={<div className="p-20">404 - Not Found</div>} />
+      </Routes>
+    </div>
   )
 }
 
