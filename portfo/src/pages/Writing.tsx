@@ -26,7 +26,7 @@ const Writing: React.FC = () => {
       >
         <div className="flex justify-between items-end mb-16">
           <h1 className="text-4xl tracking-tighter">
-            Writing.
+            Words I've written.
           </h1>
         </div>
 

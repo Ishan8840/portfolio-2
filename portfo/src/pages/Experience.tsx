@@ -20,7 +20,7 @@ const jobs: Job[] = [
     id: 2,
     role: "Robotics Researcher",
     company: "@WAT.ai", // Added @ to match the style
-    companyUrl: "https://www.wat.ai",
+    companyUrl: "https://watai.ca/",
     companyColor: "bg-yellow-100 hover:bg-yellow-200 border-black", // The yellow from your image
     location: "Waterloo, ON",
     date: "Jan 2026 - Present",

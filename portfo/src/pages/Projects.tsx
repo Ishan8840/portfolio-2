@@ -64,7 +64,7 @@ const Projects: React.FC = () => {
       >
         <div className="flex justify-between items-end mb-16">
           <h1 className="text-4xl tracking-tight">
-            Things I've built.
+            What I've built.
           </h1>
         </div>
 
