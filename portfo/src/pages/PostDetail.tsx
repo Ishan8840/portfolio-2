@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PostDetail = () => {
-  const { slug } = useParams(); // Grabs the 'slug' from the URL
+  const { slug } = useParams();
   const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the .md file from your public folder
+    setIsLoading(true);
     fetch(`/posts/${slug}.md`)
       .then((res) => {
         if (!res.ok) throw new Error("Post not found");
@@ -15,23 +17,34 @@ const PostDetail = () => {
       })
       .then((text) => {
         setContent(text);
+        setIsLoading(false);
       })
       .catch((err) => {
         console.error(err);
+        setIsLoading(false);
       });
   }, [slug]);
 
-
   return (
-    <article className="min-h-screen py-35 px-6 bg-white flex justify-center">
+    <article className="min-h-screen py-35 px-6 bg-stone flex justify-center">
       <div className="w-full max-w-2xl">
-        {/* Markdown Content */}
-        <div className="prose prose-neutral max-w-none 
-                        prose-h1:text-4xl prose-h1:font-black 
-                        prose-p:text-gray-800 prose-p:leading-relaxed
-                        prose-img:border-2 prose-img:border-black prose-img:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <ReactMarkdown>{content}</ReactMarkdown>
-        </div>
+        {/* AnimatePresence handles the smooth transition if the slug changes */}
+        <AnimatePresence mode="wait">
+          {!isLoading && (
+            <motion.div
+              key={slug} // Ensures animation re-runs if you switch posts
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.8, 
+                ease: [0.16, 1, 0.3, 1] // A "quintic" ease-out for a premium, smooth feel
+              }}
+              className="prose prose-neutral lg:prose-lg max-w-none font-serif"
+            >
+              <ReactMarkdown>{content}</ReactMarkdown>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </article>
   );
