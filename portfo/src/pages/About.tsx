@@ -85,7 +85,7 @@ const AboutMe = () => {
             >
               @waterloo
             </a>
-            . I spend my time reading, writing, playing sports, and meeting new people. I am an incoming{" "}
+            . I spend my time building, writing, playing sports, and meeting new people. I am an incoming{" "}
             <a
               href="https://www.axibo.com/"
               target="_blank"
@@ -129,7 +129,7 @@ const AboutMe = () => {
         transition={{ delay: 1, duration: 1 }}
       >
         <iframe
-          src="https://my.spline.design/nexbotrobotcharacterconcept-5lKYOvMhG9geumgjyPctRpB9/"
+          src="https://my.spline.design/nexbotrobotcharacterconcept-JPKZZ66iDXCjIQbfPLWqGt4Y/"
           className="h-[calc(100%+110px)] w-full border-none md:scale-90 md:origin-right lg:scale-100"
           allowFullScreen
         ></iframe>
