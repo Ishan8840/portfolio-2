@@ -81,9 +81,9 @@ const AboutMe = () => {
               href="https://uwaterloo.ca/"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-yellow-100 px-1 font-bold text-black transition-colors duration-200 hover:bg-yellow-300 pointer-events-auto cursor-pointer"
+              className="bg-yellow-100 px-1 text-black transition-colors duration-200 hover:bg-yellow-300 pointer-events-auto cursor-pointer"
             >
-              @waterloo
+              @uwaterloo
             </a>
             . I spend my time building, writing, playing sports, and meeting new people. I am an incoming{" "}
             <a

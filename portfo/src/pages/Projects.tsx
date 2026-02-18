@@ -22,7 +22,7 @@ const projects: Project[] = [
     description:
       "Gamified AI study habit tracker using MediaPipe for real-time detection to monitor focus, distractions, and face-touching",
     video: "/videos/studybuddy.mp4", // Replace with your .mp4 path
-    poster: "imgs/project1-thumb.png", // Optional fallback
+    poster: "imgs/study.png", // Optional fallback
     tech: ["FastAPI", "React", "Redis", "MediaPipe"],
     github: "https://github.com/Ishan8840/StudyBuddy",
     website: "https://studybuddy-htv.vercel.app/",
@@ -34,7 +34,7 @@ const projects: Project[] = [
     description:
       "Voice-controlled platform that eliminates the need for manual record searching.",
     video: "videos/operaid.mp4",
-    poster: "imgs/project2-thumb.png",
+    poster: "imgs/operaid.png",
     tech: ["Next.js", "OpenAI", "ElevenLabs"],
     github: "https://github.com/Ishan8840/OperAId",
     website: "https://operaid.framer.website/",
@@ -46,7 +46,7 @@ const projects: Project[] = [
     description:
       "A Tinder-style project discovery app for hackers and makers. Swipe right to show interest, left to pass.",
     video: "videos/hackmate.mp4",
-    poster: "imgs/project3-thumb.png",
+    poster: "imgs/hackmate.png",
     tech: ["React", "Typscript", "Supabase"],
     github: "https://github.com/Ishan8840/HackMate",
     color: "bg-red-200", // Pink
