@@ -62,7 +62,7 @@ const Experience: React.FC = () => {
   };
 
   return (
-    <section className="min-h-screen py-35 px-6 bg-white flex justify-center font-sans">
+    <section className="min-h-screen py-35 px-6 bg-stone flex justify-center font-sans">
       <motion.div
         className="w-full max-w-2xl"
         initial={{ opacity: 0, y: 20 }}
