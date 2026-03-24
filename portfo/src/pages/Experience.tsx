@@ -17,6 +17,21 @@ type Job = {
 
 const jobs: Job[] = [
   {
+    id: 3,
+    role: "Reinforcement Learning Intern",
+    company: "@AXIBO", // Added @ to match the style
+    companyUrl: "https://www.axibo.com/",
+    companyColor: "bg-red-100 hover:bg-red-200 border-black", // The yellow from your image
+    location: "Cambridge, ON",
+    date: "Incoming",
+    description: "RL and VLAs for humanoids",
+    bullets: [
+      "Developing and deploying VLAs and RL frameworks to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
+    ],
+    img: "imgs/axibo.jpeg",
+    tech: ["Pytorch", "IsaacLab", "Python"],
+  },
+  {
     id: 2,
     role: "Robotics Researcher",
     company: "@WAT.ai", // Added @ to match the style
@@ -75,7 +90,7 @@ const Experience: React.FC = () => {
             Where I've been.
           </h1>
           <a
-            href="/mle_resume.pdf"
+            href="/resume.pdf"
             target="_blank"
             className="text-base border-b-1 border-black pb-0.5 hover:text-gray-600 hover:border-gray-600 transition-all"
           >
