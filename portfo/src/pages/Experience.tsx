@@ -18,7 +18,7 @@ type Job = {
 const jobs: Job[] = [
   {
     id: 3,
-    role: "Reinforcement Learning Intern",
+    role: "Research Engineer",
     company: "@AXIBO", // Added @ to match the style
     companyUrl: "https://www.axibo.com/",
     companyColor: "bg-red-100 hover:bg-red-200 border-black", // The yellow from your image
@@ -50,7 +50,7 @@ const jobs: Job[] = [
   },
   {
     id: 1,
-    role: "Software Engineer Intern",
+    role: "Software Engineer",
     company: "@IPMD", // Added @ to match the style
     companyUrl: "https://ipmdinc.com",
     companyColor: "bg-blue-100 hover:bg-blue-200 border-black", // The pinkish/red from your image
