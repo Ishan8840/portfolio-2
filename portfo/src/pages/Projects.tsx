@@ -76,7 +76,7 @@ const Projects: React.FC = () => {
                 href={project.website || project.demo || project.github}
                 target="_blank"
                 rel="noreferrer"
-                className="block overflow-hidden rounded-xl border border-black/10 bg-gray-100 relative"
+                className="block overflow-hidden rounded-md border border-black/10 bg-gray-100 relative"
               >
                 <video
                   src={project.video}
