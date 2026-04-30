@@ -11,6 +11,6 @@
       "llm",
       "transformers"
     ],
-    "color": "bg-[#fff06b]"
+    "color": "bg-red-200"
   }
 ]
