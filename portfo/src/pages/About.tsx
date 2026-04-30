@@ -85,7 +85,7 @@ const AboutMe = () => {
             >
               @uwaterloo
             </a>
-            . I spend my time building, writing, playing sports, and meeting new people. I am an incoming{" "}
+            . I spend my time building, writing, playing sports, and meeting new people. I am incoming{" "}
             <a
               href="https://www.axibo.com/"
               target="_blank"
