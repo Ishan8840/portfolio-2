@@ -1,15 +1,15 @@
 [
   {
-    "id": "30a65c99-f58f-80de-95f4-de52c16d121e",
-    "title": "Example",
-    "slug": "example",
-    "date": "2026-02-17",
-    "readTime": "5 mins",
-    "description": "example blog post for testing out api",
+    "id": "31965c99-f58f-802b-8a91-f352a4cd6eb6",
+    "title": "Attention Is All You Need",
+    "slug": "attention-is-all-you-need",
+    "date": "2026-04-29",
+    "readTime": "6 mins",
+    "description": "A walkthrough of self-attention with a worked numerical example.",
     "tags": [
-      "hello",
-      "tag1",
-      "tag2"
+      "nlp",
+      "llm",
+      "transformers"
     ],
     "color": "bg-[#fff06b]"
   }
