@@ -20,10 +20,10 @@ export const jobs: Job[] = [
     companyUrl: "https://www.axibo.com/",
     companyColor: "bg-red-300 hover:bg-red-400 border-black",
     location: "Cambridge, ON",
-    date: "Incoming",
-    description: "RL and VLAs for humanoids",
+    date: "May 2026 - Present",
+    description: "Foundation models for humanoids",
     bullets: [
-      "Developing and deploying VLAs and RL frameworks to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
+      "Developing and deploying foundation models to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
     ],
     img: "/imgs/axibo.jpeg",
     tech: ["Pytorch", "IsaacLab", "Python"],
@@ -35,7 +35,7 @@ export const jobs: Job[] = [
     companyUrl: "https://watai.ca/",
     companyColor: "bg-yellow-200 hover:bg-yellow-400 border-black",
     location: "Waterloo, ON",
-    date: "Jan 2026 - Present",
+    date: "Jan 2026 - July 2026",
     description: "Teaching robots with human preferences, not just rewards.",
     bullets: [
       "Researching preference learning and human-feedback-driven optimization for sequential decision-making models.",

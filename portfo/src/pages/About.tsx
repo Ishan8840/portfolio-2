@@ -83,7 +83,7 @@ const AboutMe = () => {
             </a>
             , where I am working on{" "}
             <span className="bg-blue-200 px-1 text-black transition-colors duration-200 hover:bg-blue-400">
-              RL & VLAs
+              foundation models
             </span>{" "}
             for humanoids.
           </motion.p>

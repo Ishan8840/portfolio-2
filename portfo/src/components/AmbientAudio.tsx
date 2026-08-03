@@ -5,14 +5,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *
  * Browsers block audio-with-sound from starting without a user gesture, so a
  * true "plays on load" is not achievable — `play()` rejects with
- * NotAllowedError. What this does instead: remember the visitor's choice, and if
- * they had it on, arm playback to resume on their very first interaction of the
- * next visit. First-time visitors get silence until they ask for sound.
+ * NotAllowedError. So it starts at the earliest moment allowed: the visitor's
+ * first click, tap or keypress anywhere on the page. Muting is remembered and
+ * suppresses that on later visits.
  *
- * The track lives at public/audio/lala.mp3 and is only fetched when someone
- * actually presses play (preload="none"), so it costs first-time visitors
- * nothing. If the file is missing the control hides rather than showing a dead
- * button.
+ * The track is only fetched once playback is attempted (preload="none"), so it
+ * costs nothing to anyone who leaves immediately. If the file is missing the
+ * control hides rather than showing a dead button.
  */
 
 const SRC = "/audio/lala-128.mp3";
@@ -84,21 +83,37 @@ export default function AmbientAudio() {
     };
   }, []);
 
-  // If they left it on last time, resume at the first gesture of this visit.
+  /**
+   * Start at the visitor's first interaction anywhere on the page — the
+   * earliest point a browser will allow audio — unless they have explicitly
+   * muted it before, in which case that choice sticks across visits.
+   */
   useEffect(() => {
     if (!available) return;
-    if (localStorage.getItem(PREF_KEY) !== "on") return;
+    if (localStorage.getItem(PREF_KEY) === "off") return;
 
-    const arm = () => {
-      void start();
-      remove();
+    const arm = async (e: Event) => {
+      // A click on the control itself is the toggle's job. Starting here too
+      // would race it: this begins playback, then the click handler sees a
+      // playing track and immediately stops it.
+      const el = e.target as Element | null;
+      if (el?.closest?.("[data-ambient-toggle]")) {
+        remove();
+        return;
+      }
+      // Only stop listening once playback actually took, so a rejected attempt
+      // can still succeed on a later gesture.
+      if (await start()) remove();
     };
+    // pointerdown covers mouse (it maps to mousedown, which grants activation),
+    // but on touch activation only arrives at touchend/click — a pointerdown
+    // attempt there fails with NotAllowedError. Listening to several events and
+    // only unsubscribing once playback takes covers both.
+    const EVENTS = ["pointerdown", "pointerup", "click", "keydown"] as const;
     const remove = () => {
-      window.removeEventListener("pointerdown", arm);
-      window.removeEventListener("keydown", arm);
+      for (const t of EVENTS) window.removeEventListener(t, arm);
     };
-    window.addEventListener("pointerdown", arm, { once: false });
-    window.addEventListener("keydown", arm, { once: false });
+    for (const t of EVENTS) window.addEventListener(t, arm);
     return remove;
   }, [available, start]);
 
@@ -130,6 +145,7 @@ export default function AmbientAudio() {
       />
       <button
         type="button"
+        data-ambient-toggle
         onClick={toggle}
         aria-pressed={playing}
         aria-label={playing ? "Mute background music" : "Play background music"}
