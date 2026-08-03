@@ -14,6 +14,33 @@
 
 
 @layer base {
+  /* Cursor: a hollow ring with a centre dot, echoing the rail's nodes, and a
+     filled dot over anything interactive. Native `cursor:` rather than a
+     JS-drawn element, so there is no pointer latency. Note this does override
+     an enlarged OS cursor, which is the trade-off any custom cursor makes. */
+  body {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='9' cy='9' r='6' fill='none' stroke='%23111110' stroke-width='1.25'/%3E%3Ccircle cx='9' cy='9' r='1.1' fill='%23111110'/%3E%3C/svg%3E")
+        9 9,
+      default;
+  }
+
+  a,
+  button,
+  [role="button"],
+  summary,
+  label {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='9' cy='9' r='6' fill='%23111110'/%3E%3Ccircle cx='9' cy='9' r='2' fill='%23f4f2ec'/%3E%3C/svg%3E")
+        9 9,
+      pointer;
+  }
+
+  /* Typing and selection keep their real affordances. */
+  input,
+  textarea,
+  [contenteditable] {
+    cursor: text;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;

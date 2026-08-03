@@ -10,6 +10,7 @@ import PostDetail from "./pages/PostDetail";
 import Rail from "./components/Rail";
 import CommandPalette from "./components/CommandPalette";
 import AmbientAudio from "./components/AmbientAudio";
+import CursorTrail from "./components/CursorTrail";
 import DiffusionTransition from "./components/DiffusionTransition";
 import { ROUTES } from "./lib/nav";
 
@@ -66,6 +67,7 @@ function App() {
     <div className="bg-stone">
       <Rail onOpenPalette={openPalette} />
       <AmbientAudio />
+      <CursorTrail />
       {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
 
       <DiffusionTransition location={location}>

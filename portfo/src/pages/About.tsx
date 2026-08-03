@@ -52,7 +52,7 @@ const AboutMe = () => {
                 <img
                   src={link.icon}
                   alt={link.label}
-                  className="h-5 w-5 cursor-pointer transition-all duration-300 ease-in-out hover:scale-125 sm:h-6 sm:w-6"
+                  className="h-5 w-5 transition-all duration-300 ease-in-out hover:scale-125 sm:h-6 sm:w-6"
                 />
               </a>
             ))}
@@ -67,7 +67,7 @@ const AboutMe = () => {
               href="https://uwaterloo.ca/"
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-pointer bg-yellow-200 px-1 text-black transition-colors duration-200 hover:bg-yellow-400"
+              className="bg-yellow-200 px-1 text-black transition-colors duration-200 hover:bg-yellow-400"
             >
               @uwaterloo
             </a>
@@ -77,12 +77,12 @@ const AboutMe = () => {
               href="https://www.axibo.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="cursor-pointer bg-red-300 px-1 text-black transition-colors duration-200 hover:bg-red-400"
+              className="bg-red-300 px-1 text-black transition-colors duration-200 hover:bg-red-400"
             >
               @AXIBO
             </a>
             , where I am working on{" "}
-            <span className="cursor-default bg-blue-200 px-1 text-black transition-colors duration-200 hover:bg-blue-400">
+            <span className="bg-blue-200 px-1 text-black transition-colors duration-200 hover:bg-blue-400">
               RL & VLAs
             </span>{" "}
             for humanoids.
@@ -108,7 +108,7 @@ const AboutMe = () => {
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="cursor-default text-[15px] leading-snug text-ink transition-colors duration-200 group-hover:text-ink sm:text-base">
+                  <span className="text-[15px] leading-snug text-ink transition-colors duration-200 group-hover:text-ink sm:text-base">
                     {label}
                   </span>
                 </li>
