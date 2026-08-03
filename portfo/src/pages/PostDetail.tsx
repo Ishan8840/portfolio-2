@@ -27,7 +27,7 @@ const PostDetail = () => {
   }, [slug]);
 
   return (
-    <article className="min-h-screen py-35 px-6 bg-stone flex justify-center">
+    <article className="min-h-screen py-35 px-6 flex justify-center">
       <div className="w-full max-w-2xl">
         <AnimatePresence mode="wait">
           {!isLoading && (

@@ -1,219 +1,205 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
+import { useRef, useState } from "react";
+import { jobs } from "../data/jobs";
 
-type Job = {
-  id: number;
-  role: string;
-  company: string;
-  companyUrl: string;
-  companyColor: string; // New field for the highlight color
-  location: string;
-  date: string;
-  description: string;
-  bullets: string[];
-  img: string;
-  tech: string[];
+const listVars: Variants = {
+  initial: {},
+  animate: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-const jobs: Job[] = [
-  {
-    id: 3,
-    role: "Research Engineer",
-    company: "@AXIBO", // Added @ to match the style
-    companyUrl: "https://www.axibo.com/",
-    companyColor: "bg-red-100 hover:bg-red-200 border-black", // The yellow from your image
-    location: "Cambridge, ON",
-    date: "Incoming",
-    description: "RL and VLAs for humanoids",
-    bullets: [
-      "Developing and deploying VLAs and RL frameworks to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
-    ],
-    img: "imgs/axibo.jpeg",
-    tech: ["Pytorch", "IsaacLab", "Python"],
-  },
-  {
-    id: 2,
-    role: "Robotics Researcher",
-    company: "@WAT.ai", // Added @ to match the style
-    companyUrl: "https://watai.ca/",
-    companyColor: "bg-yellow-100 hover:bg-yellow-200 border-black", // The yellow from your image
-    location: "Waterloo, ON",
-    date: "Jan 2026 - Present",
-    description: "Teaching robots with human preferences, not just rewards.",
-    bullets: [
-      "Researching preference learning and human-feedback-driven optimization for sequential decision-making models.",
-      "Implementing and evaluating learning pipelines in Python/PyTorch, collaborating with researchers on experimental design and analysis.",
-      "Exploring scalable human-in-the-loop training setups to improve policy robustness under sparse or under specified reward signals.",
-    ],
-    img: "imgs/wat.png",
-    tech: ["Pytorch", "Mujoco", "Python"],
-  },
-  {
-    id: 1,
-    role: "Software Engineer",
-    company: "@IPMD", // Added @ to match the style
-    companyUrl: "https://ipmdinc.com",
-    companyColor: "bg-blue-100 hover:bg-blue-200 border-black", // The pinkish/red from your image
-    location: "San Mateo, CA",
-    date: "July 2025 - Sept 2025",
-    description: "Worked on an AI-powered personal therapist",
-    bullets: [
-      "Replaced custom auth logic with Flask-JWT-Extended, centralizing token management across 10 endpoints and resolving registration edge cases.",
-      "Modularized frontend by extracting 5+ reusable components, reducing code duplication by 30% and accelerating future feature development.",
-      "Built a real-time computer vision–driven emotion analysis pipeline integrated into a React (TypeScript) chat interface, surfacing live sentiment feedback during conversations.",
-    ],
-    img: "imgs/ipmd.jpeg",
-    tech: ["Flask", "React", "TypeScript"],
-  },
-];
+const itemVars: Variants = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
+};
 
 const Experience: React.FC = () => {
-  const [visibleBullets, setVisibleBullets] = useState<number[]>([]);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [pinned, setPinned] = useState<number[]>([]);
+  const closeTimer = useRef<number | null>(null);
 
-  const toggleBullets = (id: number) => {
-    setVisibleBullets((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+  // Keyed off the event's own pointerType rather than a `(hover: hover)` media
+  // query: the query reports false in environments that do support hovering,
+  // which silently disabled the whole interaction.
+  const isHoverPointer = (t: string) => t !== "touch";
+
+  const openOn = (id: number) => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setHovered(id);
   };
 
+  /**
+   * Collapsing shifts the entries below it, so a cursor sweeping down the list
+   * can land on a different card than the one it was heading for. A short grace
+   * period before closing keeps that from flickering.
+   */
+  const closeSoon = () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setHovered(null), 140);
+  };
+
+  const togglePin = (id: number) =>
+    setPinned((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
   return (
-    <section className="min-h-screen py-35 px-6 bg-stone flex justify-center font-sans">
+    <section className="flex min-h-screen justify-center px-6 py-35 font-sans">
       <motion.div
         className="w-full max-w-2xl"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Header Section */}
-        <div className="flex justify-between items-end mb-16">
-          <h1 className="text-4xl tracking-tight">
-            Where I've been.
-          </h1>
+        <div className="mb-14 flex items-end justify-between">
+          <h1 className="text-4xl tracking-tight">Where I've been.</h1>
           <a
             href="/resume.pdf"
             target="_blank"
-            className="text-base border-b-1 border-black pb-0.5 hover:text-gray-600 hover:border-gray-600 transition-all"
+            className="border-b border-ink pb-0.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all hover:border-gray-500 hover:text-muted"
           >
-            RESUME
+            Resume
           </a>
         </div>
 
-        {/* Experience List */}
-        <div className="space-y-12">
-          {jobs.map((job) => (
-            <div key={job.id} className="group relative flex gap-6">
-              {/* Logo */}
-              <div className="flex-shrink-0 pt-1">
-                <img
-                  src={job.img}
-                  alt={job.company}
-                  className="w-12 h-12 rounded-lg border border-black/10 object-cover"
-                />
-              </div>
+        <motion.ol
+          className="relative"
+          variants={listVars}
+          initial="initial"
+          animate="animate"
+        >
+          {/* Timeline rail: the logos sit on it as nodes. */}
+          <span
+            aria-hidden
+            className="absolute left-6 top-8 bottom-8 w-px bg-ink/10"
+          />
 
-              {/* Content */}
-              <div className="flex-1">
+          {jobs.map((job) => {
+            const expanded = hovered === job.id || pinned.includes(job.id);
+            return (
+              <motion.li key={job.id} variants={itemVars}>
                 <div
-                  className="flex justify-between items-start cursor-pointer select-none"
-                  onClick={() => toggleBullets(job.id)}
+                  onPointerEnter={(e) => {
+                    if (isHoverPointer(e.pointerType)) openOn(job.id);
+                  }}
+                  onPointerLeave={(e) => {
+                    if (isHoverPointer(e.pointerType)) closeSoon();
+                  }}
+                  className={`group relative -mx-4 flex gap-5 rounded-lg px-4 py-5 transition-colors duration-300 ${
+                    expanded ? "bg-ink/[0.025]" : ""
+                  }`}
                 >
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-black leading-snug flex flex-wrap items-baseline gap-x-2">
-                      <span>{job.role}</span>
-                      
-                      {/* The Highlighted Company Link */}
-                      <a
-                        href={job.companyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`px-1 ${job.companyColor}`}
-                        onClick={(e) => e.stopPropagation()}
+                  <div className="relative shrink-0">
+                    <img
+                      src={job.img}
+                      alt={job.company}
+                      className={`h-12 w-12 rounded-lg border object-cover transition-colors duration-300 ${
+                        expanded ? "border-ink/25" : "border-ink/10"
+                      }`}
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <h2 className="flex flex-wrap items-baseline gap-x-2 text-xl font-bold leading-snug text-ink">
+                          <span>{job.role}</span>
+                          <a
+                            href={job.companyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`px-1 ${job.companyColor}`}
+                          >
+                            {job.company}
+                          </a>
+                        </h2>
+
+                        <div className="mt-1.5 flex flex-col gap-y-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted sm:flex-row sm:items-center sm:gap-2">
+                          <span className="whitespace-nowrap">{job.date}</span>
+                          <span className="hidden h-[3px] w-[3px] rounded-full bg-subtle sm:block" />
+                          <span className="whitespace-nowrap">{job.location}</span>
+                        </div>
+                      </div>
+
+                      {/* Real button so this is reachable and toggleable by
+                          keyboard; focusing it also opens the entry. */}
+                      <button
+                        type="button"
+                        aria-expanded={expanded}
+                        aria-label={`${expanded ? "Collapse" : "Expand"} details for ${job.role} at ${job.company}`}
+                        onClick={() => togglePin(job.id)}
+                        onFocus={() => setHovered(job.id)}
+                        onBlur={closeSoon}
+                        className={`mt-2 shrink-0 rounded p-1 text-subtle transition-all duration-300 hover:text-ink focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-black/30 ${
+                          expanded
+                            ? "opacity-100"
+                            : "opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                        }`}
                       >
-                        {job.company}
-                      </a>
-                    </h2>
-                    
-                    <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 font-medium">
-                      <span>{job.date}</span>
-                      <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                      <span>{job.location}</span>
+                        <svg
+                          viewBox="0 0 10 6"
+                          className={`h-1.5 w-2.5 transition-transform duration-300 ${
+                            expanded ? "rotate-180" : ""
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                        >
+                          <path d="M1 1l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {job.tech.map((t) => (
+                        <span
+                          key={t}
+                          className={`border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${
+                            expanded
+                              ? "border-ink bg-surface text-ink"
+                              : "border-ink/25 text-muted"
+                          }`}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="relative mt-3 overflow-hidden">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {expanded ? (
+                          <motion.ul
+                            key="bullets"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            className="ml-4 list-disc space-y-2 text-sm leading-relaxed text-ink"
+                          >
+                            {job.bullets.map((bullet, i) => (
+                              <li key={i}>{bullet}</li>
+                            ))}
+                          </motion.ul>
+                        ) : (
+                          <motion.p
+                            key="desc"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                            className="text-sm leading-relaxed text-muted"
+                          >
+                            {job.description}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
-
-                  {/* Original Icon Toggle */}
-                  <div className="mt-1.5 flex-shrink-0 ml-4">
-                    {visibleBullets.includes(job.id) ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 640 640"
-                        className="w-4 h-4 text-black hover:scale-110 transition-all duration-200"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M503.5 71C512.9 61.6 528.1 61.6 537.4 71L569.4 103C578.8 112.4 578.8 127.6 569.4 136.9L482.4 223.9L521.4 262.9C528.3 269.8 530.3 280.1 526.6 289.1C522.9 298.1 514.2 304 504.5 304L360.5 304C347.2 304 336.5 293.3 336.5 280L336.5 136C336.5 126.3 342.3 117.5 351.3 113.8C360.3 110.1 370.6 112.1 377.5 119L416.5 158L503.5 71zM136.5 336L280.5 336C293.8 336 304.5 346.7 304.5 360L304.5 504C304.5 513.7 298.7 522.5 289.7 526.2C280.7 529.9 270.4 527.9 263.5 521L224.5 482L137.5 569C128.1 578.4 112.9 578.4 103.6 569L71.6 537C62.2 527.6 62.2 512.4 71.6 503.1L158.6 416.1L119.6 377.1C112.7 370.2 110.7 359.9 114.4 350.9C118.1 341.9 126.8 336 136.5 336z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 640 640"
-                        className="w-4 h-4 text-black hover:scale-110 transition-all duration-200"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M408 64L552 64C565.3 64 576 74.7 576 88L576 232C576 241.7 570.2 250.5 561.2 254.2C552.2 257.9 541.9 255.9 535 249L496 210L409 297C399.6 306.4 384.4 306.4 375.1 297L343.1 265C333.7 255.6 333.7 240.4 343.1 231.1L430.1 144.1L391.1 105.1C384.2 98.2 382.2 87.9 385.9 78.9C389.6 69.9 398.3 64 408 64zM232 576L88 576C74.7 576 64 565.3 64 552L64 408C64 398.3 69.8 389.5 78.8 385.8C87.8 382.1 98.1 384.2 105 391L144 430L231 343C240.4 333.6 255.6 333.6 264.9 343L296.9 375C306.3 384.4 306.3 399.6 296.9 408.9L209.9 495.9L248.9 534.9C255.8 541.8 257.8 552.1 254.1 561.1C250.4 570.1 241.7 576 232 576z"
-                        />
-                      </svg>
-                    )}
-                  </div>
                 </div>
-
-                {/* Tech Stack - Updated to Match the "Interests" style in image */}
-                <div className="flex flex-wrap gap-2 mb-4 mt-3">
-                  {job.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-black bg-white border border-black"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Description / Bullets */}
-                <div className="relative overflow-hidden">
-                  <AnimatePresence mode="wait">
-                    {visibleBullets.includes(job.id) ? (
-                      <motion.ul
-                        key="bullets"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-2 text-sm text-gray-700 list-disc ml-4 leading-relaxed"
-                      >
-                        {job.bullets.map((bullet, i) => (
-                          <li key={i}>{bullet}</li>
-                        ))}
-                      </motion.ul>
-                    ) : (
-                      <motion.p
-                        key="desc"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-sm text-gray-600 leading-relaxed"
-                      >
-                        {job.description}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </motion.li>
+            );
+          })}
+        </motion.ol>
       </motion.div>
     </section>
   );
