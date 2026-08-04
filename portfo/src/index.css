@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Blog title highlights. fetch-blog.js writes these class names into
+   src/data/blog-posts.json, so Tailwind only ever sees the subset the current
+   posts happen to use — the first post to be assigned a new colour would get a
+   class that was never compiled. Safelisting the whole palette avoids that. */
+@source inline("bg-{yellow,blue,red,emerald,purple,orange,sky,pink,lime,indigo}-200");
+
 @theme {
   /* Named colour tokens. `bg-stone` was previously not a real class — Tailwind's
      stone palette only exists as numbered shades — so the background silently

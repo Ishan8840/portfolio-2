@@ -1,5 +1,83 @@
 [
   {
+    "id": "35565c99-f58f-8027-84ea-dcaea53825c0",
+    "title": "Octo",
+    "slug": "octo",
+    "date": "2026-04-29",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on Octo.",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-yellow-200"
+  },
+  {
+    "id": "35465c99-f58f-807f-b195-f8cf256f9579",
+    "title": "OpenX",
+    "slug": "openx",
+    "date": "2026-04-26",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on OpenX",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-blue-200"
+  },
+  {
+    "id": "35465c99-f58f-80a6-8ddf-c411c987f12a",
+    "title": "Open-VLA",
+    "slug": "open-vla",
+    "date": "2026-04-24",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on Open-VLA",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-red-200"
+  },
+  {
+    "id": "35365c99-f58f-8043-a829-d314eec7b05e",
+    "title": "RT-2",
+    "slug": "rt-2",
+    "date": "2026-04-22",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on RT-2",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-emerald-200"
+  },
+  {
+    "id": "35265c99-f58f-80a3-b5d6-fa7225f0e912",
+    "title": "PaLM-E",
+    "slug": "palm-e",
+    "date": "2026-04-23",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on PaLM-E",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-purple-200"
+  },
+  {
+    "id": "35265c99-f58f-8062-9efb-e1c740188109",
+    "title": "RT-1",
+    "slug": "rt-1",
+    "date": "2026-04-21",
+    "readTime": "2 mins",
+    "description": "Study on VLAs: notes on RT-1",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-orange-200"
+  },
+  {
     "id": "31965c99-f58f-802b-8a91-f352a4cd6eb6",
     "title": "Attention Is All You Need",
     "slug": "attention-is-all-you-need",
@@ -11,6 +89,6 @@
       "llm",
       "transformers"
     ],
-    "color": "bg-red-200"
+    "color": "bg-sky-200"
   }
 ]

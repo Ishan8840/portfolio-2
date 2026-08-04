@@ -9,6 +9,30 @@ dotenv.config();
 
 const NOTION_KEY = process.env.NOTION_KEY;
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
+
+/**
+ * Title highlight colours, assigned by index rather than at random: picking
+ * randomly from a short list clusters badly (the previous 4-colour version
+ * gave three blues in a row), and it reshuffled every refresh. Cycling means
+ * no two neighbours ever match and a post keeps its colour between runs.
+ *
+ * Ordered so consecutive entries sit far apart in hue. These class names are
+ * safelisted in src/index.css — Tailwind can only see the ones already present
+ * in blog-posts.json, so a colour used for the first time would otherwise
+ * compile to nothing.
+ */
+const HIGHLIGHTS = [
+  "bg-yellow-200",
+  "bg-blue-200",
+  "bg-red-200",
+  "bg-emerald-200",
+  "bg-purple-200",
+  "bg-orange-200",
+  "bg-sky-200",
+  "bg-pink-200",
+  "bg-lime-200",
+  "bg-indigo-200",
+];
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Initialize converter
@@ -64,7 +88,7 @@ async function fetchMarkdown() {
         readTime: page.properties.ReadTime?.rich_text[0]?.plain_text || "5 min read",
         description: page.properties.Description?.rich_text[0]?.plain_text || "",
         tags: tags,
-        color: ["bg-purple-200", "bg-blue-200", "bg-red-200", "bg-yellow-200"][Math.floor(Math.random() * 4)]
+        color: HIGHLIGHTS[postMetadata.length % HIGHLIGHTS.length]
       });
     }
 
