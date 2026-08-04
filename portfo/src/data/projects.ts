@@ -15,11 +15,11 @@ export type Project = {
 export const projects: Project[] = [
   {
     id: 1,
-    title: "PiPER-X VLA",
+    title: "laundry folding robot",
     description: "researching scalable robot learning systems by improving the data, algorithms, and infrastructure behind Vision-Language-Action models for real-world manipulation.",
     video: "/videos/fold.mp4",
     poster: "/imgs/fold.png",
-    tech: ["pi05", "VLA", "JAX", "PyTorch"],
+    tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "https://operaid.framer.website/",
     color: "bg-blue-300",
   },
