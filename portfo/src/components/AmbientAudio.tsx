@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * control hides rather than showing a dead button.
  */
 
-const SRC = "/audio/lala-128.mp3";
+const SRC = "/audio/boy-128.mp3";
 const PREF_KEY = "ambient-audio";
 const VOLUME = 0.32;
 const FADE_MS = 700;
