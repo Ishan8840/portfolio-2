@@ -52,7 +52,7 @@ const Experience: React.FC = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="mb-14 flex items-end justify-between">
-          <h1 className="text-4xl tracking-tight">Where I've been.</h1>
+          <h1 className="text-4xl tracking-tight">where i've been.</h1>
           <a
             href="/resume.pdf"
             target="_blank"

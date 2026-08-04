@@ -12,7 +12,7 @@ const Projects: React.FC = () => {
       >
         <div className="flex justify-between items-end mb-16">
           <h1 className="text-4xl tracking-tight">
-            What I've built.
+            what i've built.
           </h1>
         </div>
 

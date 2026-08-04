@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { socials } from "../lib/nav";
 
 const interests = [
-  "World models",
-  "Automated research",
-  "Using internet video for physical intelligence",
+  "world models",
+  "automated research",
+  "using internet video for physical intelligence",
 ];
 
 const containerVars = {
@@ -33,7 +33,7 @@ const AboutMe = () => {
         <div className="space-y-5 md:space-y-6">
           <motion.div variants={itemVars}>
             <h1 className="group text-4xl font-black leading-none tracking-tighter text-ink sm:text-5xl md:text-6xl">
-              I'm Ishan{" "}
+              i'm ishan{" "}
               <span className="inline-block transition-transform duration-300 ease-in-out group-hover:rotate-[20deg]">
                 👋
               </span>
@@ -79,7 +79,7 @@ const AboutMe = () => {
               rel="noopener noreferrer"
               className="bg-red-300 px-1 text-black transition-colors duration-200 hover:bg-red-400"
             >
-              @AXIBO
+              @axibo
             </a>
             , where I am working on{" "}
             <span className="bg-blue-200 px-1 text-black transition-colors duration-200 hover:bg-blue-400">
