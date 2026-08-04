@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES, socials } from "../lib/nav";
 import { jobs } from "../data/jobs";
@@ -90,6 +90,8 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const results = useMemo(() => {
     if (!query.trim()) return ITEMS.slice(0, 8);
@@ -118,6 +120,44 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       document.body.style.overflow = prev;
     };
   }, []);
+
+  // aria-modal claims the rest of the page is inert, but nothing enforced that:
+  // Tab walked straight out into the links behind the scrim. Cycle focus within
+  // the dialog instead, and hand it back where it came from on close.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusable = root.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const at = document.activeElement;
+      if (e.shiftKey && (at === first || !root.contains(at))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && at === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onTab, true);
+    return () => {
+      document.removeEventListener("keydown", onTab, true);
+      opener?.focus?.();
+    };
+  }, []);
+
+  // Arrowing past the visible window left the highlight off-screen.
+  useEffect(() => {
+    listRef.current
+      ?.querySelector<HTMLElement>('[data-active="true"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [active]);
 
   const run = (item: Item) => {
     onClose();
@@ -149,6 +189,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       onMouseDown={onClose}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
@@ -167,6 +208,10 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
             }}
             placeholder="jump to anything…"
             aria-label="Search"
+            role="combobox"
+            aria-expanded
+            aria-controls="palette-results"
+            aria-activedescendant={results[active] ? `palette-${results[active].id}` : undefined}
             className="w-full bg-transparent py-4 font-mono text-sm text-ink outline-none placeholder:text-subtle"
           />
           <kbd className="font-mono text-[10px] uppercase tracking-wider text-subtle">
@@ -174,7 +219,13 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
           </kbd>
         </div>
 
-        <div className="max-h-[52vh] overflow-y-auto py-2">
+        <div
+          ref={listRef}
+          id="palette-results"
+          role="listbox"
+          aria-label="Results"
+          className="max-h-[52vh] overflow-y-auto py-2"
+        >
           {results.length === 0 && (
             <p className="px-4 py-6 text-center font-mono text-xs text-subtle">
               nothing matches “{query}”
@@ -183,6 +234,11 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
           {results.map((item, i) => (
             <button
               key={item.id}
+              id={`palette-${item.id}`}
+              role="option"
+              aria-selected={i === active}
+              data-active={i === active}
+              tabIndex={-1}
               onMouseEnter={() => setActive(i)}
               onClick={() => run(item)}
               className={`flex w-full items-baseline gap-3 px-4 py-2.5 text-left transition-colors ${

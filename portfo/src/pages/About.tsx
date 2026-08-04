@@ -49,9 +49,13 @@ const AboutMe = () => {
                 target={link.href.startsWith("mailto:") ? undefined : "_blank"}
                 rel="noopener noreferrer"
               >
+                {/* alt="" on purpose: the anchor above already carries the
+                    label, and a matching alt makes screen readers say it twice. */}
                 <img
                   src={link.icon}
-                  alt={link.label}
+                  alt=""
+                  width={24}
+                  height={24}
                   className="h-5 w-5 transition-all duration-300 ease-in-out hover:scale-125 sm:h-6 sm:w-6"
                 />
               </a>

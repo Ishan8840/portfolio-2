@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal site — React 19, Vite, TypeScript, Tailwind v4.
 
-Currently, two official plugins are available:
+## Running it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev      # dev server
+npm run build    # typecheck + production build
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Blog
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Posts live in a Notion database and are pulled in as markdown.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run refresh-blog
 ```
+
+This writes one `public/posts/<slug>.md` per post plus the listing metadata in
+`src/data/blog-posts.json`. Both are committed, so the deployed site serves what
+was last fetched — not whatever is currently live in Notion.
+
+It needs a `.env` in this directory:
+
+```
+NOTION_KEY=...            # integration secret from notion.so/my-integrations
+NOTION_DATABASE_ID=...    # the 32-char id in the database URL
+```
+
+The database must also be shared with the integration (`···` → Connections). A
+valid key without access returns an empty result rather than an error.
+
+Expected properties: `Name` (title), `Status` (must be `Published`), `Date`,
+`Description`, `ReadTime`, `Tags`.
+
+Note that the script never deletes: unpublishing a post in Notion drops it from
+the listing but leaves its `.md` behind.
+
+## Layout
+
+```
+src/
+  components/
+    DiffusionTransition.tsx   page transition over the page's real pixels
+    CommandPalette.tsx        ⌘K / "/" jump-to-anything
+    Rail.tsx                  left hairline nav, bottom bar on small screens
+    AmbientAudio.tsx          background track, starts on first interaction
+    ClickSound.tsx            click tick
+    CursorTrail.tsx           pixel trail behind the cursor
+  lib/
+    rasterize.ts              paints the live DOM to a canvas
+    click-sound.ts            Web Audio playback
+    nav.ts                    routes, key bindings
+  pages/
+  data/                       jobs, projects, generated blog metadata
+```
+
+Navigation is keyboard-first: `1`–`4` jump to sections, `j`/`k` step through
+them, `/` or `⌘K` opens the palette.

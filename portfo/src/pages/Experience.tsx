@@ -93,6 +93,8 @@ const Experience: React.FC = () => {
                     <img
                       src={job.img}
                       alt={job.company}
+                      width={48}
+                      height={48}
                       className={`h-12 w-12 rounded-lg border object-cover transition-colors duration-300 ${
                         expanded ? "border-ink/25" : "border-ink/10"
                       }`}

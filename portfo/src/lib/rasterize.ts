@@ -34,14 +34,60 @@ export function warmPosters(root: HTMLElement) {
   }
 }
 
-function parseColor(c: string): [number, number, number, number] | null {
+type RGBA = [number, number, number, number];
+
+/** Resolved colours, keyed by their computed string. A page uses a couple of
+ *  dozen distinct colours across thousands of elements. */
+const colorCache = new Map<string, RGBA | null>();
+/** `undefined` means "not built yet"; `null` means 2D context unavailable. */
+let probeCtx: CanvasRenderingContext2D | null | undefined;
+
+/**
+ * Resolve a computed CSS colour to RGBA.
+ *
+ * The rgb()/rgba() branch is a fast path, not the whole story: Tailwind v4
+ * ships its palette in oklch() and alpha modifiers as color-mix(), which
+ * compute to oklch() and oklab() respectively. Matching only rgb() dropped
+ * every highlight, tag fill, tint and hairline border from the capture — the
+ * transition rendered text and images on bare background.
+ *
+ * Anything not plainly rgb() is handed to a 1x1 canvas and read back, which
+ * works for any colour space the browser can parse and needs no per-format
+ * maths here. Results are cached because getImageData is far too slow to run
+ * per element.
+ */
+function parseColor(c: string): RGBA | null {
   if (!c || c === "transparent" || c === "none") return null;
-  const m = c.match(/rgba?\(([^)]+)\)/);
-  if (!m) return null;
-  const p = m[1].split(",").map((s) => parseFloat(s));
-  const a = p.length > 3 ? p[3] : 1;
-  if (a <= 0.01) return null;
-  return [p[0], p[1], p[2], a];
+
+  const m = c.match(/^rgba?\(([^)]+)\)$/);
+  if (m) {
+    // Handles both "rgb(17, 17, 16)" and the space/slash form "rgb(17 17 16 / .1)".
+    const p = m[1].split(/[\s,/]+/).filter(Boolean).map(parseFloat);
+    const a = p.length > 3 ? p[3] : 1;
+    return a > 0.01 ? [p[0], p[1], p[2], a] : null;
+  }
+
+  const cached = colorCache.get(c);
+  if (cached !== undefined) return cached;
+
+  if (probeCtx === undefined) {
+    const cv = document.createElement("canvas");
+    cv.width = 1;
+    cv.height = 1;
+    probeCtx = cv.getContext("2d", { willReadFrequently: true });
+  }
+
+  let out: RGBA | null = null;
+  if (probeCtx) {
+    probeCtx.clearRect(0, 0, 1, 1);
+    probeCtx.fillStyle = c;
+    probeCtx.fillRect(0, 0, 1, 1);
+    const d = probeCtx.getImageData(0, 0, 1, 1).data;
+    const a = d[3] / 255;
+    if (a > 0.01) out = [d[0], d[1], d[2], a];
+  }
+  colorCache.set(c, out);
+  return out;
 }
 
 const rgba = (c: [number, number, number, number]) =>

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { ROUTES } from "../lib/nav";
+import { NAV_KEYS, ROUTES, activeRouteIndex } from "../lib/nav";
 
 /**
  * Replaces the header. On desktop it's a hairline rail on the left edge that
@@ -8,7 +8,8 @@ import { ROUTES } from "../lib/nav";
  */
 export default function Rail({ onOpenPalette }: { onOpenPalette: () => void }) {
   const { pathname } = useLocation();
-  const activeIndex = ROUTES.findIndex((r) => r.path === pathname);
+  // Sub-routes count as their section, so reading a post keeps "thoughts" marked.
+  const activeIndex = activeRouteIndex(pathname);
 
   return (
     <>
@@ -22,8 +23,8 @@ export default function Rail({ onOpenPalette }: { onOpenPalette: () => void }) {
             aria-hidden
             className="absolute left-[3px] top-1 bottom-1 w-px bg-ink/12"
           />
-          {ROUTES.map((route) => {
-            const active = pathname === route.path;
+          {ROUTES.map((route, i) => {
+            const active = i === activeIndex;
             return (
               <Link
                 key={route.path}
@@ -56,9 +57,11 @@ export default function Rail({ onOpenPalette }: { onOpenPalette: () => void }) {
       {/* Keyboard legend */}
       <button
         onClick={onOpenPalette}
+        aria-label="Open command palette"
         className="fixed bottom-7 right-8 z-50 hidden font-mono text-[10px] uppercase tracking-[0.2em] text-subtle transition-colors hover:text-ink lg:block"
       >
-        1–4 · j/k · <span className="text-muted">⌘K</span>
+        {NAV_KEYS[0]}–{NAV_KEYS[NAV_KEYS.length - 1]} · j/k ·{" "}
+        <span className="text-muted">⌘K</span>
       </button>
 
       {/* Touch fallback */}
@@ -76,8 +79,8 @@ export default function Rail({ onOpenPalette }: { onOpenPalette: () => void }) {
               opacity: activeIndex < 0 ? 0 : 1,
             }}
           />
-          {ROUTES.map((route) => {
-            const active = pathname === route.path;
+          {ROUTES.map((route, i) => {
+            const active = i === activeIndex;
             return (
               <Link
                 key={route.path}

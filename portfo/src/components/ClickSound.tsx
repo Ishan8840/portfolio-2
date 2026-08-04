@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { playClick, primeClick, unlockClick } from "../lib/click-sound";
+import { NAV_KEYS } from "../lib/nav";
 
 /**
  * Ticks on every primary press anywhere on the page, not only on interactive
@@ -38,7 +39,11 @@ export default function ClickSound() {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable))
         return;
-      if (/^[1-4jk]$/i.test(e.key) || e.key === "Enter") playClick(0.8);
+      // Derived from ROUTES rather than a literal [1-4], which silently stopped
+      // matching whenever the route list changed length.
+      const k = e.key.toLowerCase();
+      if (NAV_KEYS.includes(k) || k === "j" || k === "k" || e.key === "Enter")
+        playClick(0.8);
     };
 
     window.addEventListener("pointerdown", onDown);

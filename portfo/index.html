@@ -2,9 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="imgs/icon.png">
+    <!-- Absolute path: a relative one resolves against the current route, so
+         nested URLs like /writing/octo looked for /writing/imgs/icon.png. -->
+    <link rel="icon" type="image/png" href="/imgs/icon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ishan Shah</title>
+    <meta name="description" content="Ishan Shah — research engineer working on foundation models for humanoids. Writing about world models, robot learning and physical intelligence." />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Ishan Shah" />
+    <meta property="og:description" content="Research engineer working on foundation models for humanoids." />
+    <meta property="og:image" content="/imgs/icon.png" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Ishan Shah" />
+    <meta name="twitter:description" content="Research engineer working on foundation models for humanoids." />
+    <meta name="twitter:image" content="/imgs/icon.png" />
   </head>
   <body>
     <div id="root"></div>

@@ -112,6 +112,64 @@ const easeInOut = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /**
+ * One reusable field.
+ *
+ * Building this fresh per navigation allocated ~4.6MB of typed arrays every
+ * time, which then became garbage during the animation itself — the worst
+ * possible moment to hand the collector work. The particle count is a fixed
+ * constant, so the buffers are allocated once and overwritten.
+ */
+let pooled: Field | null = null;
+
+function poolField(n: number): Field {
+  if (pooled && pooled.sx.length >= n) {
+    pooled.n = n;
+    return pooled;
+  }
+  pooled = {
+    n,
+    sx: new Float32Array(n),
+    sy: new Float32Array(n),
+    nx: new Float32Array(n),
+    ny: new Float32Array(n),
+    dx: new Float32Array(n),
+    dy: new Float32Array(n),
+    sr: new Uint8Array(n),
+    sg: new Uint8Array(n),
+    sb: new Uint8Array(n),
+    dr: new Uint8Array(n),
+    dg: new Uint8Array(n),
+    db: new Uint8Array(n),
+    delay: new Float32Array(n),
+    phx: new Int32Array(n),
+    phy: new Int32Array(n),
+    er: new Int16Array(n),
+    eg: new Int16Array(n),
+    eb: new Int16Array(n),
+    jr: new Int8Array(n),
+    jg: new Int8Array(n),
+    jb: new Int8Array(n),
+    srcBlock: 1,
+    dstBlock: 1,
+  };
+  return pooled;
+}
+
+/** Scratch buffers for assignNearest, likewise reused between navigations. */
+const scratch: {
+  cells: number;
+  n: number;
+  counts?: Int32Array;
+  cellOf?: Int32Array;
+  starts?: Int32Array;
+  items?: Uint32Array;
+  cursor?: Int32Array;
+  near?: Int32Array;
+  queue?: Int32Array;
+  rot?: Int32Array;
+} = { cells: 0, n: 0 };
+
+/**
  * Give every particle a destination close to where it already is.
  *
  * Pairing by reading order made particles cross the whole viewport, which read
@@ -124,24 +182,42 @@ function assignNearest(f: Field, dst: Particles, w: number, h: number) {
   const gh = Math.max(1, Math.ceil(h / CELL));
   const cells = gw * gh;
 
-  const counts = new Int32Array(cells);
-  const cellOf = new Int32Array(dst.n);
+  // Grown on demand and reused; a resize is the only thing that changes `cells`.
+  if (scratch.cells < cells || scratch.n < dst.n) {
+    scratch.cells = Math.max(scratch.cells, cells);
+    scratch.n = Math.max(scratch.n, dst.n);
+    scratch.counts = new Int32Array(scratch.cells);
+    scratch.cellOf = new Int32Array(scratch.n);
+    scratch.starts = new Int32Array(scratch.cells + 1);
+    scratch.items = new Uint32Array(scratch.n);
+    scratch.cursor = new Int32Array(scratch.cells);
+    scratch.near = new Int32Array(scratch.cells);
+    scratch.queue = new Int32Array(scratch.cells);
+    scratch.rot = new Int32Array(scratch.cells);
+  }
+  const counts = scratch.counts!;
+  const cellOf = scratch.cellOf!;
+  const starts = scratch.starts!;
+  const items = scratch.items!;
+  const cursor = scratch.cursor!;
+  counts.fill(0, 0, cells);
+
   for (let j = 0; j < dst.n; j++) {
     const c = ((dst.y[j] / CELL) | 0) * gw + ((dst.x[j] / CELL) | 0);
     cellOf[j] = c;
     counts[c]++;
   }
 
-  const starts = new Int32Array(cells + 1);
+  starts[0] = 0;
   for (let c = 0; c < cells; c++) starts[c + 1] = starts[c] + counts[c];
-  const items = new Uint32Array(dst.n);
-  const cursor = starts.slice(0, cells);
+  for (let c = 0; c < cells; c++) cursor[c] = starts[c];
   for (let j = 0; j < dst.n; j++) items[cursor[cellOf[j]]++] = j;
 
   // Multi-source BFS: every cell learns the nearest cell that has destinations,
   // so particles over empty regions of the new page still find somewhere close.
-  const near = new Int32Array(cells).fill(-1);
-  const queue = new Int32Array(cells);
+  const near = scratch.near!;
+  const queue = scratch.queue!;
+  near.fill(-1, 0, cells);
   let qh = 0;
   let qt = 0;
   for (let c = 0; c < cells; c++) {
@@ -166,7 +242,8 @@ function assignNearest(f: Field, dst: Particles, w: number, h: number) {
     if (cy < gh - 1) visit(c + gw);
   }
 
-  const rot = new Int32Array(cells);
+  const rot = scratch.rot!;
+  rot.fill(0, 0, cells);
   for (let i = 0; i < f.n; i++) {
     const c = ((f.sy[i] / CELL) | 0) * gw + ((f.sx[i] / CELL) | 0);
     const tc = near[Math.min(cells - 1, Math.max(0, c))];
@@ -448,32 +525,9 @@ export default function DiffusionTransition({
     const { w, h } = dims.current;
     const n = src.n;
 
-    const f: Field = {
-      n,
-      sx: new Float32Array(n),
-      sy: new Float32Array(n),
-      nx: new Float32Array(n),
-      ny: new Float32Array(n),
-      dx: new Float32Array(n),
-      dy: new Float32Array(n),
-      sr: new Uint8Array(n),
-      sg: new Uint8Array(n),
-      sb: new Uint8Array(n),
-      dr: new Uint8Array(n),
-      dg: new Uint8Array(n),
-      db: new Uint8Array(n),
-      delay: new Float32Array(n),
-      phx: new Int32Array(n),
-      phy: new Int32Array(n),
-      er: new Int16Array(n),
-      eg: new Int16Array(n),
-      eb: new Int16Array(n),
-      jr: new Int8Array(n),
-      jg: new Int8Array(n),
-      jb: new Int8Array(n),
-      srcBlock: src.block,
-      dstBlock: src.block,
-    };
+    const f = poolField(n);
+    f.srcBlock = src.block;
+    f.dstBlock = src.block;
 
     for (let i = 0; i < n; i++) {
       const s = i;
