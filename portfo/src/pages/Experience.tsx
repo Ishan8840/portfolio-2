@@ -53,13 +53,6 @@ const Experience: React.FC = () => {
       >
         <div className="mb-14 flex items-end justify-between">
           <h1 className="text-4xl tracking-tight">where i've been.</h1>
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            className="border-b border-ink pb-0.5 font-mono text-[11px] uppercase tracking-[0.2em] transition-all hover:border-gray-500 hover:text-muted"
-          >
-            Resume
-          </a>
         </div>
 
         <motion.ol

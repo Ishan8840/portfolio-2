@@ -27,14 +27,6 @@ const ITEMS: Item[] = [
     kind: "page",
     to: r.path,
   })),
-  {
-    id: "action:resume",
-    label: "resume",
-    hint: "open the PDF",
-    kind: "action",
-    href: "/resume.pdf",
-    keywords: "cv",
-  },
   ...jobs.map((j) => ({
     id: `job:${j.id}`,
     label: `${j.company} · ${j.role}`,
