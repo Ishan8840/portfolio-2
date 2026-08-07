@@ -1,5 +1,46 @@
 [
   {
+    "id": "3b365c99-f58f-8017-b630-d9ee2504a0f2",
+    "title": "Working With VLAs: The Last 5%",
+    "slug": "working-with-vlas-the-last-5",
+    "date": "2026-08-05",
+    "readTime": "2 mins",
+    "description": "Findings on post trainig methods for VLAs: recap, dsrl…",
+    "tags": [
+      "VLA",
+      "Manipulation",
+      "RL"
+    ],
+    "color": "bg-yellow-200"
+  },
+  {
+    "id": "3b365c99-f58f-80be-95e6-f3e6b68d342b",
+    "title": "Working With VLAs: Training + Inference",
+    "slug": "working-with-vlas-training-inference",
+    "date": "2026-08-05",
+    "readTime": "3 mins",
+    "description": "My findings on how inference correlates to performance for VLAs",
+    "tags": [
+      "VLA",
+      "Manipulation"
+    ],
+    "color": "bg-blue-200"
+  },
+  {
+    "id": "3b265c99-f58f-80e0-9554-fffd4e1781ef",
+    "title": "Working With VLAs: Data",
+    "slug": "working-with-vlas-data",
+    "date": "2026-08-04",
+    "readTime": "3 mins",
+    "description": "My findings on how data affects VLAs",
+    "tags": [
+      "VLA",
+      "Manipulation",
+      "Data"
+    ],
+    "color": "bg-red-200"
+  },
+  {
     "id": "35565c99-f58f-8027-84ea-dcaea53825c0",
     "title": "Octo",
     "slug": "octo",
@@ -10,7 +51,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-yellow-200"
+    "color": "bg-emerald-200"
   },
   {
     "id": "35465c99-f58f-807f-b195-f8cf256f9579",
@@ -23,7 +64,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-blue-200"
+    "color": "bg-purple-200"
   },
   {
     "id": "35465c99-f58f-80a6-8ddf-c411c987f12a",
@@ -36,7 +77,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-red-200"
+    "color": "bg-orange-200"
   },
   {
     "id": "35365c99-f58f-8043-a829-d314eec7b05e",
@@ -49,7 +90,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-emerald-200"
+    "color": "bg-sky-200"
   },
   {
     "id": "35265c99-f58f-80a3-b5d6-fa7225f0e912",
@@ -62,7 +103,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-purple-200"
+    "color": "bg-pink-200"
   },
   {
     "id": "35265c99-f58f-8062-9efb-e1c740188109",
@@ -75,7 +116,7 @@
       "VLA",
       "Manipulation"
     ],
-    "color": "bg-orange-200"
+    "color": "bg-lime-200"
   },
   {
     "id": "31965c99-f58f-802b-8a91-f352a4cd6eb6",
@@ -89,6 +130,6 @@
       "llm",
       "transformers"
     ],
-    "color": "bg-sky-200"
+    "color": "bg-indigo-200"
   }
 ]

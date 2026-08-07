@@ -20,7 +20,7 @@ export const projects: Project[] = [
     video: "/videos/fold.mp4",
     poster: "/imgs/fold.webp",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
-    website: "https://operaid.framer.website/",
+    website: "http://ishanshah.org/writing/working-with-vlas-training-inference",
     color: "bg-blue-300",
   },
 ];
