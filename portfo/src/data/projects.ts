@@ -28,7 +28,7 @@ export const projects: Project[] = [
     title: "espresso robot",
     description: "implemented hierarchical planning for Vision-Language-Action models",
     video: "/videos/coffee.mp4",
-    poster: "/imgs/coffee.webp",
+    poster: "/imgs/coffee.png",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "http://ishanshah.org/writing/working-with-vlas-training-inference",
     color: "bg-green-300",
