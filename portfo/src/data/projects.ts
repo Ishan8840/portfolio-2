@@ -16,7 +16,7 @@ export const projects: Project[] = [
   {
     id: 1,
     title: "laundry folding robot",
-    description: "improved the data, algorithms, and infrastructure behind Vision-Language-Action models for deformable task learning",
+    description: "improved the data, algorithms, and infrastructure behind π₀.₅ for deformable task learning",
     video: "/videos/fold.mp4",
     poster: "/imgs/fold.webp",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
@@ -31,6 +31,6 @@ export const projects: Project[] = [
     poster: "/imgs/coffee.png",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "http://ishanshah.org/writing/working-with-vlas-training-inference",
-    color: "bg-green-300",
+    color: "bg-purple-300",
   },
 ];
