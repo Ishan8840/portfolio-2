@@ -56,7 +56,7 @@ const AboutMe = () => {
                   alt=""
                   width={24}
                   height={24}
-                  className="h-5 w-5 transition-all duration-300 ease-in-out hover:scale-125 sm:h-6 sm:w-6"
+                  className="h-5 w-5 transition-all duration-300 ease-in-out hover:scale-110 sm:h-6 sm:w-6"
                 />
               </a>
             ))}

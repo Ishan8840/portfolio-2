@@ -59,9 +59,20 @@ const PostDetail = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="prose prose-neutral lg:prose-lg max-w-none font-serif"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.body}</ReactMarkdown>
+            <div className="prose prose-neutral lg:prose-lg max-w-none font-serif">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.body}</ReactMarkdown>
+            </div>
+
+            {/* Outside the prose wrapper so typography styles don't reach it. */}
+            <div className="mt-16 border-t border-ink/10 pt-6">
+              <Link
+                to="/writing"
+                className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-ink"
+              >
+                ← back to writing
+              </Link>
+            </div>
           </motion.div>
         ) : null}
       </div>

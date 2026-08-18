@@ -3,8 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <!-- Absolute path: a relative one resolves against the current route, so
-         nested URLs like /writing/octo looked for /writing/imgs/icon.png. -->
-    <link rel="icon" type="image/png" href="/imgs/icon.png">
+         nested URLs like /writing/octo looked for /writing/imgs/icon.png.
+         Separate from the og:image below — the browser fetches this on every
+         page load, so it is a 64px cut rather than the full-size icon. -->
+    <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ishan Shah</title>
     <meta name="description" content="Ishan Shah — research engineer working on foundation models for humanoids. Writing about world models, robot learning and physical intelligence." />

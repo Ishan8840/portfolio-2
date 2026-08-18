@@ -56,6 +56,15 @@ Videos use `preload="none"` — they only download on hover. `preload="metadata"
 looks the same at rest but pulls the entire file (measured: 15.6MB across the
 three clips), which is what the posters exist to avoid.
 
+## SEO
+
+`npm run build` runs `make-sitemap.js` first, which writes `public/sitemap.xml`
+and `public/robots.txt`. Routes come from `src/lib/nav.ts` and posts from
+`blog-posts.json`, so neither needs a second list kept in sync. Output carries no
+build timestamp, so an unchanged site rebuilds to an identical file.
+
+Change the domain at the top of `make-sitemap.js` if it moves.
+
 ## Layout
 
 ```

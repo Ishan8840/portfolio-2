@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node make-sitemap.js && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "refresh-blog": "node fetch-blog.js",
-    "posters": "node make-posters.js"
+    "posters": "node make-posters.js",
+    "sitemap": "node make-sitemap.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useNavigationType } from "react-router-dom";
 import type { Location } from "react-router-dom";
 import {
   extractParticles,
@@ -155,6 +156,16 @@ function poolField(n: number): Field {
   return pooled;
 }
 
+/**
+ * Scroll offset per history entry.
+ *
+ * Every navigation used to jump to the top, including Back — so returning from
+ * a post dropped you at the top of the list you had scrolled down through. On a
+ * POP we restore the offset the entry was left at; anything else still starts
+ * at the top.
+ */
+const scrollMemory = new Map<string, number>();
+
 /** Scratch buffers for assignNearest, likewise reused between navigations. */
 const scratch: {
   cells: number;
@@ -275,6 +286,7 @@ export default function DiffusionTransition({
 }) {
   const [displayed, setDisplayed] = useState(location);
   const [phase, setPhase] = useState<Phase>("idle");
+  const navType = useNavigationType();
 
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -292,6 +304,16 @@ export default function DiffusionTransition({
   useEffect(() => {
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }, []);
+
+  /** Where the page being left was scrolled to, so Back can return to it. */
+  const rememberScroll = () => {
+    scrollMemory.set(displayed.key, window.scrollY);
+  };
+
+  const applyScroll = (next: Location) => {
+    const y = navType === "POP" ? (scrollMemory.get(next.key) ?? 0) : 0;
+    window.scrollTo(0, y);
+  };
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
@@ -507,19 +529,22 @@ export default function DiffusionTransition({
     if (location.key === displayed.key) return;
 
     if (reduced.current) {
+      rememberScroll();
       setDisplayed(location);
-      window.scrollTo(0, 0);
+      applyScroll(location);
       return;
     }
 
     const src = captureParticles();
     if (!src || !src.n) {
+      rememberScroll();
       setDisplayed(location);
-      window.scrollTo(0, 0);
+      applyScroll(location);
       return;
     }
 
     clearTimers();
+    rememberScroll();
     pending.current = location;
 
     const { w, h } = dims.current;
@@ -565,7 +590,7 @@ export default function DiffusionTransition({
         const next = pending.current;
         if (next) {
           setDisplayed(next);
-          window.scrollTo(0, 0);
+          applyScroll(next);
         }
       }, SWAP_AT)
     );
