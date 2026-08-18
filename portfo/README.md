@@ -39,6 +39,23 @@ Expected properties: `Name` (title), `Status` (must be `Published`), `Date`,
 Note that the script never deletes: unpublishing a post in Notion drops it from
 the listing but leaves its `.md` behind.
 
+## Projects
+
+Add the entry to `src/data/projects.ts` and drop the clip in `public/videos/`,
+then:
+
+```bash
+npm run posters
+```
+
+That writes `public/posters/<name>.webp` from each clip's first frame. The cards
+reference it by deriving the path from the video, so there is no poster field to
+set and the still can never disagree with the video it stands in for.
+
+Videos use `preload="none"` — they only download on hover. `preload="metadata"`
+looks the same at rest but pulls the entire file (measured: 15.6MB across the
+three clips), which is what the posters exist to avoid.
+
 ## Layout
 
 ```

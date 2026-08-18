@@ -5,6 +5,9 @@ import { projects, type Project } from "../data/projects";
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const primary = project.website || project.demo || project.github;
+  const poster = project.video
+    .replace("/videos/", "/posters/")
+    .replace(/\.mp4$/, ".webp");
 
   // Hovering anywhere on the card plays the clip, not just the media box.
   // play() rejects with AbortError when a pause lands mid-load, which is normal
@@ -36,18 +39,28 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
       onMouseEnter={play}
       onMouseLeave={stop}
     >
-      <div className="relative block overflow-hidden rounded-md border border-ink/10 bg-ink/5">
+      {/* 16:9 rather than a fixed h-64. At max-w-2xl that height made the box
+          2.625:1 while every clip here is roughly 1.78:1, so a third of each
+          video's height was being cropped away. */}
+      <div className="relative block aspect-video overflow-hidden rounded-md border border-ink/10 bg-ink/5">
         <video
           ref={videoRef}
           src={project.video}
-          poster={project.poster}
+          // Generated from this clip's own first frame by `npm run posters`, so
+          // it is exactly what the video shows when paused and cannot disagree
+          // with it on framing. Deriving the path rather than storing one means
+          // a new project never needs artwork picked for it.
+          poster={poster}
           muted
           loop
           playsInline
-          // Without this the browser fully buffers the clip on every visit; now
-          // only the poster loads, and the clip fetches on hover.
+          // preload="metadata" would look the same but costs the whole file:
+          // measured at 15.6MB across the three clips. The poster is ~30kB.
           preload="none"
-          className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500 ease-out"
+          // No hover zoom: it crops the edges at exactly the moment the clip is
+          // playing and being watched. Hover feedback comes from the title
+          // highlight, the tags and the border instead.
+          className="h-full w-full object-cover"
         />
       </div>
 

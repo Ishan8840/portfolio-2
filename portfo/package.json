@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "refresh-blog": "node fetch-blog.js"
+    "refresh-blog": "node fetch-blog.js",
+    "posters": "node make-posters.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
