@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 
 import AboutMe from "./pages/About";
 import Experience from "./pages/Experience";
@@ -104,6 +105,7 @@ function App() {
           </Suspense>
         )}
       </DiffusionTransition>
+      <Analytics />
     </div>
   );
 }
