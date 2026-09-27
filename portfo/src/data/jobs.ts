@@ -14,13 +14,28 @@ export type Job = {
 
 export const jobs: Job[] = [
   {
+    id: 4,
+    role: "founding research engineer",
+    company: "@preload",
+    companyUrl: "https://preload.ai/",
+    companyColor: "bg-orange-200 hover:bg-orange-300 border-black",
+    location: "San Francisco, CA",
+    date: "Sept 2026 - Present",
+    description: "teaching robots how humans move and feel",
+    bullets: [
+      "Research using egocentric sEMG and force-feedback to train tactile manipulation policies.",
+    ],
+    img: "/imgs/preload.jpeg",
+    tech: ["Pytorch", "EMG", "Python"],
+  },
+  {
     id: 3,
     role: "research engineer",
     company: "@axibo",
     companyUrl: "https://www.axibo.com/",
     companyColor: "bg-red-300 hover:bg-red-400 border-black",
     location: "Cambridge, ON",
-    date: "May 2026 - Present",
+    date: "May 2026 - Sept 2026",
     description: "foundation models for humanoids",
     bullets: [
       "Developing and deploying foundation models to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
