@@ -3,6 +3,7 @@ export type Project = {
   title: string;
   description: string;
   video: string;
+  caption: string;
   tech: string[];
   github?: string;
   demo?: string;
@@ -18,6 +19,7 @@ export const projects: Project[] = [
     description:
       "long-horizon policy for 65-DoF, fusing vision + tactile sensing with learned hierarchical planning to fold a six-fold paper airplane.",
     video: "/videos/sharpa.mp4",
+    caption: "65 degrees of freedom. Vision + touch.",
     tech: ["JAX", "PyTorch", "Tactile", "VLA"],
     website: "https://robotic-origami-challenge.github.io",
     color: "bg-red-300",
@@ -27,6 +29,7 @@ export const projects: Project[] = [
     title: "espresso robot",
     description: "implemented hierarchical planning for Vision-Language-Action models",
     video: "/videos/coffee.mp4",
+    caption: "A 2-minute coffee routine.",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "http://ishanshah.org/writing/working-with-vlas-training-inference",
     color: "bg-purple-300",
@@ -36,6 +39,7 @@ export const projects: Project[] = [
     title: "laundry folding robot",
     description: "improved the data, algorithms, and infrastructure behind π₀.₅ for deformable task learning",
     video: "/videos/fold.mp4",
+    caption: "Learning to fold with π₀.₅.",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "http://ishanshah.org/writing/working-with-vlas-training-inference",
     color: "bg-blue-300",

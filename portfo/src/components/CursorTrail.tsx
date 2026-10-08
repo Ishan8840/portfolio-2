@@ -1,23 +1,14 @@
 import { useEffect, useRef } from "react";
 
-/**
- * A short pixel trail behind the cursor, echoing the page transition: square
- * monochrome pixels that scatter slightly and fade.
- *
- * Kept deliberately sparse — the transition can afford 90k particles because it
- * owns the screen for a second, whereas this sits under everything you read all
- * the time. Emission is rate-limited and tied to pointer speed, so it reacts to
- * a flick and stays nearly invisible during slow, deliberate movement.
- *
- * The render loop only runs while pixels are alive, so an idle page costs
- * nothing. Disabled for touch pointers and for prefers-reduced-motion.
+/** A sparse, short-lived trail of tiny monochrome squares.
+ * Only animates while particles are alive; touch and reduced motion stay still.
  */
 
-const MAX = 260;
-const LIFE_MS = 520;
+const MAX = 60;
+const LIFE_MS = 400;
 const PIXEL = 2;
 /** Spawn at most one burst per this interval, regardless of event rate. */
-const EMIT_EVERY_MS = 16;
+const EMIT_EVERY_MS = 20;
 
 type P = { x: number; y: number; vx: number; vy: number; born: number };
 
@@ -68,8 +59,8 @@ export default function CursorTrail() {
         p.y += p.vy;
         p.vx *= 0.94;
         p.vy *= 0.94;
-        ctx.fillStyle = `rgba(${rgb},${0.34 * (1 - age) * (1 - age)})`;
-        ctx.fillRect(p.x, p.y, PIXEL, PIXEL);
+        ctx.fillStyle = `rgba(${rgb},${0.26 * (1 - age) * (1 - age)})`;
+        ctx.fillRect(Math.round(p.x), Math.round(p.y), PIXEL, PIXEL);
       }
 
       if (pool.length) {
@@ -81,7 +72,7 @@ export default function CursorTrail() {
     };
 
     const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return;
+      if (e.pointerType !== "mouse") return;
 
       const now = performance.now();
       if (!primed) {
@@ -101,14 +92,14 @@ export default function CursorTrail() {
 
       // Faster movement sheds more pixels; slow movement barely any.
       const speed = Math.hypot(dx, dy);
-      const count = Math.min(4, Math.round(speed / 9));
+      const count = Math.min(3, Math.round(speed / 10));
       for (let i = 0; i < count; i++) {
         if (pool.length >= MAX) pool.shift();
         pool.push({
-          x: e.clientX + (Math.random() * 2 - 1) * 5,
-          y: e.clientY + (Math.random() * 2 - 1) * 5,
-          vx: (Math.random() * 2 - 1) * 0.5,
-          vy: (Math.random() * 2 - 1) * 0.5,
+          x: e.clientX + (Math.random() * 2 - 1) * 2,
+          y: e.clientY + (Math.random() * 2 - 1) * 2,
+          vx: (Math.random() * 2 - 1) * 0.15,
+          vy: (Math.random() * 2 - 1) * 0.15,
           born: now,
         });
       }

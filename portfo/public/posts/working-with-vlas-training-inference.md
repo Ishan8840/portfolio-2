@@ -137,6 +137,12 @@ A simple way to increase the throughput of a chunking policy is using cubic inte
 For example, actions like releasing an object at exactly the right moment can become harder if the motion timing changes too much.
 
 
+## Hierarchical Planning
+
+
+One issue with current manipulation policies is that a single policy struggles with extremely long-horizon tasks. We encountered this when making coffee, where one episode took around 6 minutes. A high-level planner can break the task into smaller subtasks, such as **grind beans → brew coffee → add milk → serve**, allowing each policy to specialize and making targeted data collection and debugging faster. We tested several methods for switching subtasks: VLMs worked well but were too slow for frequent switching, making them better suited for major task changes like coffee → walking → folding; CNN classification worked well for visual cues; and pose detection was the fastest and simplest option for known sequences with predefined waypoints.
+
+
 ## Summary
 
 

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion } from "framer-motion";
+import ReadingProgress from "../components/ReadingProgress";
 
 type State =
   | { status: "loading" }
@@ -41,8 +42,9 @@ const PostDetail = () => {
   }, [slug]);
 
   return (
-    <article className="min-h-screen py-35 px-6 flex justify-center">
-      <div className="w-full max-w-2xl">
+    <article className="page article-page">
+      {state.status === "ready" && <ReadingProgress />}
+      <div className="w-full">
         {state.status === "missing" ? (
           <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
             <p>no post at “{slug}”.</p>
@@ -60,7 +62,7 @@ const PostDetail = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            <div className="prose prose-neutral lg:prose-lg max-w-none font-serif">
+            <div className="prose prose-neutral max-w-none article-prose">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.body}</ReactMarkdown>
             </div>
 

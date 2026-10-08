@@ -177,7 +177,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[999] flex items-start justify-center bg-black/15 px-4 pt-[14vh] backdrop-blur-[2px]"
+      className="fixed inset-0 z-[999] flex items-start justify-center bg-black/20 px-4 pt-[14vh] backdrop-blur-[2px]"
       onMouseDown={onClose}
     >
       <div
@@ -185,7 +185,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="w-full max-w-xl border border-ink bg-surface shadow-[6px_6px_0_0_var(--color-ink)]"
+        className="w-full max-w-xl rounded-xl border border-ink/10 bg-surface shadow-xl"
         onMouseDown={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
       >

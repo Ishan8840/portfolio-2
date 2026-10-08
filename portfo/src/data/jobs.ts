@@ -29,6 +29,19 @@ export const jobs: Job[] = [
     tech: ["Pytorch", "EMG", "Python"],
   },
   {
+    id: 5,
+    role: "researcher",
+    company: "uwaterloo",
+    companyUrl: "https://uwaterloo.ca/",
+    companyColor: "bg-yellow-200 hover:bg-yellow-400 border-black",
+    location: "",
+    date: "Sept 2026 - Present",
+    description: "non-prehensile manipulation",
+    bullets: [],
+    img: "/imgs/uwaterloo.png",
+    tech: [],
+  },
+  {
     id: 3,
     role: "research engineer",
     company: "@axibo",
@@ -36,7 +49,7 @@ export const jobs: Job[] = [
     companyColor: "bg-red-300 hover:bg-red-400 border-black",
     location: "Cambridge, ON",
     date: "May 2026 - Sept 2026",
-    description: "foundation models for humanoids",
+    description: "foundation models for humanoid manipulation",
     bullets: [
       "Developing and deploying foundation models to enhance autonomous bimanual manipulation and locomotion capabilities for humanoid robotic platforms.",
     ],

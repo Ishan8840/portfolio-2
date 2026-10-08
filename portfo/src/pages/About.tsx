@@ -1,128 +1,43 @@
-import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { socials } from "../lib/nav";
+import { projects } from "../data/projects";
+import posts from "../data/blog-posts.json";
 
-const interests = [
-  "world models",
-  "automated research",
-  "using internet video for physical intelligence",
-];
+function playPreview(link: HTMLAnchorElement) {
+  void link.querySelector('video')?.play().catch(() => {});
+}
 
-const containerVars = {
-  initial: { opacity: 0, y: 20 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, staggerChildren: 0.1 },
-  },
-};
+function stopPreview(link: HTMLAnchorElement) {
+  const video = link.querySelector('video');
+  if (!video) return;
+  video.pause();
+  video.currentTime = 0;
+}
 
-const itemVars = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0 },
-};
-
-const AboutMe = () => {
-  return (
-    <section className="flex min-h-screen items-center justify-center px-6 py-32 font-sans">
-      <motion.div
-        className="w-full max-w-2xl"
-        variants={containerVars}
-        initial="initial"
-        animate="animate"
-      >
-        <div className="space-y-5 md:space-y-6">
-          <motion.div variants={itemVars}>
-            <h1 className="group text-4xl font-black leading-none tracking-tighter text-ink sm:text-5xl md:text-6xl">
-              i'm ishan{" "}
-              <span className="inline-block transition-transform duration-300 ease-in-out group-hover:rotate-[20deg]">
-                👋
-              </span>
-            </h1>
-          </motion.div>
-
-          <motion.div variants={itemVars} className="flex items-center gap-3 md:gap-4">
-            {socials.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                aria-label={link.label}
-                target={link.href.startsWith("mailto:") ? undefined : "_blank"}
-                rel="noopener noreferrer"
-              >
-                {/* alt="" on purpose: the anchor above already carries the
-                    label, and a matching alt makes screen readers say it twice. */}
-                <img
-                  src={link.icon}
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="h-5 w-5 transition-all duration-300 ease-in-out hover:scale-110 sm:h-6 sm:w-6"
-                />
-              </a>
-            ))}
-          </motion.div>
-
-          <motion.p
-            variants={itemVars}
-            className="max-w-xl text-base font-medium leading-relaxed text-ink sm:text-lg"
-          >
-            I study{" "}
-            <a
-              href="https://uwaterloo.ca/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-yellow-200 px-1 text-black transition-colors duration-200 hover:bg-yellow-400"
-            >
-              @uwaterloo
-            </a>
-            . I spend my time building, writing, playing sports, and meeting new people. I
-            am currently{" "}
-            <a
-              href="https://www.axibo.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-red-300 px-1 text-black transition-colors duration-200 hover:bg-red-400"
-            >
-              @axibo
-            </a>
-            , where I am working on{" "}
-            <span className="bg-blue-200 px-1 text-black transition-colors duration-200 hover:bg-blue-400">
-              foundation models
-            </span>{" "}
-            for humanoids.
-          </motion.p>
-
-          {/* Indexed hairline list. These are phrases, not one-word tags, so
-              they're set in the body face for readability; the mono numerals and
-              hairlines carry the same meta system used elsewhere on the site.
-              Width matches the bio above so the column edges line up. */}
-          <motion.div variants={itemVars} className="max-w-xl pt-1">
-            <h2 className="mb-1 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-subtle">
-              Interests
-            </h2>
-            <ul>
-              {interests.map((label, i) => (
-                <li
-                  key={label}
-                  className="group flex items-baseline gap-4 border-b border-ink/10 py-2.5"
-                >
-                  <span
-                    aria-hidden
-                    className="font-mono text-[10px] tabular-nums text-subtle transition-colors duration-200 group-hover:text-muted"
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-[15px] leading-snug text-ink transition-colors duration-200 group-hover:text-ink sm:text-base">
-                    {label}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </div>
-      </motion.div>
+export default function AboutMe() {
+  return <div className="page home-page">
+    <section className="intro">
+      <div className="intro-copy">
+        <p>I’m a founding research engineer at <a href="https://preload.ai/" target="_blank" rel="noopener noreferrer">Preload</a>, teaching robots how humans move and feel. Previously, I worked on foundation models for humanoid manipulation at <a href="https://www.axibo.com/" target="_blank" rel="noopener noreferrer">Axibo</a>.</p>
+        <p>I study at the <a href="https://uwaterloo.ca/" target="_blank" rel="noopener noreferrer">University of Waterloo</a>. Lately, I’ve been thinking about world models, automated research, and learning physical intelligence from internet video.</p>
+        <p>Outside of work, I enjoy writing, playing sports, and meeting new people.</p>
+      </div>
+      <div className="social-links">{socials.map(link => <a key={link.label} href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer">{link.label}<span aria-hidden="true">↗</span></a>)}</div>
     </section>
-  );
-};
-
-export default AboutMe;
+    <section className="home-section">
+      <div className="section-heading"><h2>Selected work</h2><Link to="/projects">All projects <span aria-hidden="true">↗</span></Link></div>
+      <div className="selected-projects">{projects.slice(0,2).map(project => <a className="selected-project" key={project.id}
+        onMouseEnter={event => playPreview(event.currentTarget)}
+        onMouseLeave={event => stopPreview(event.currentTarget)}
+        onFocus={event => playPreview(event.currentTarget)}
+        onBlur={event => stopPreview(event.currentTarget)} href={project.website || project.github || project.demo} target="_blank" rel="noopener noreferrer">
+        <div className="project-thumbnail"><video src={project.video} poster={project.video.replace('/videos/', '/posters/').replace('.mp4', '.webp')} muted loop playsInline preload="none" aria-label={`${project.title} preview`} aria-describedby={`preview-caption-${project.id}`} width="640" height="360" /><span className="video-caption" id={`preview-caption-${project.id}`}>{project.caption}</span></div>
+        <h3>{project.title}<span aria-hidden="true">↗</span></h3><p>{project.description}</p>
+      </a>)}</div>
+    </section>
+    <section className="home-section">
+      <div className="section-heading"><h2>Recent writing</h2><Link to="/writing">All writing <span aria-hidden="true">↗</span></Link></div>
+      <div className="recent-writing">{posts.slice(0,3).map(post => <Link key={post.id} to={`/writing/${post.slug}`}><span>{post.title}</span><time dateTime={post.date}>{new Date(`${post.date}T12:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</time></Link>)}</div>
+    </section>
+  </div>;
+}

@@ -38,7 +38,7 @@ export function activeRouteIndex(pathname: string): number {
 }
 
 export const socials = [
-  { label: "Twitter", href: "https://x.com/IshanShahh", icon: "/imgs/x.svg" },
+  { label: "X", href: "https://x.com/IshanShahh", icon: "/imgs/x.svg" },
   { label: "GitHub", href: "https://github.com/Ishan8840", icon: "/imgs/github.svg" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/ishahh", icon: "/imgs/linkedin.svg" },
   { label: "Email", href: "mailto:i9shah@uwaterloo.ca", icon: "/imgs/email.svg" },
