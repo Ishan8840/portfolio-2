@@ -156,26 +156,28 @@ function App() {
               </div>
             }
           >
-            <Routes>
-              <Route path="/" element={<AboutMe />} />
-              <Route path="/experience" element={<Experience />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/writing" element={<Writing />} />
-              <Route
-                path="/writing/:slug"
-                element={<PostDetail key={location.pathname} />}
-              />
-              <Route
-                path="*"
-                element={
-                  <div className="page page-message">
-                    <h1>Page not found</h1>
-                    <p>There’s nothing at this address.</p>
-                    <Link to="/">← Back home</Link>
-                  </div>
-                }
-              />
-            </Routes>
+            <div key={location.pathname} className="page-transition">
+              <Routes>
+                <Route path="/" element={<AboutMe />} />
+                <Route path="/experience" element={<Experience />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/writing" element={<Writing />} />
+                <Route
+                  path="/writing/:slug"
+                  element={<PostDetail key={location.pathname} />}
+                />
+                <Route
+                  path="*"
+                  element={
+                    <div className="page page-message">
+                      <h1>Page not found</h1>
+                      <p>There’s nothing at this address.</p>
+                      <Link to="/">← Back home</Link>
+                    </div>
+                  }
+                />
+              </Routes>
+            </div>
           </Suspense>
         </main>
         <Analytics />

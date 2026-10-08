@@ -545,17 +545,21 @@ h1 {
 .loading-state {
   color: var(--color-muted);
 }
+/* Only route content fades; navigation, audio and the color wash stay mounted. */
+.page-transition,
 .article-content {
-  animation: article-enter 300ms ease-out;
+  animation: page-enter 220ms ease-out;
 }
-@keyframes article-enter {
+/* Articles fade once their fetched content is ready, rather than twice. */
+.page-transition:has(.article-page) {
+  animation: none;
+}
+@keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
