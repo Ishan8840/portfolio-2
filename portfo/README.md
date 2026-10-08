@@ -30,8 +30,7 @@ NOTION_KEY=...            # integration secret from notion.so/my-integrations
 NOTION_DATABASE_ID=...    # the 32-char id in the database URL
 ```
 
-The database must also be shared with the integration (`···` → Connections). A
-valid key without access returns an empty result rather than an error.
+The database must also be shared with the integration (`···` → Connections). Check both the credentials and database access if the request fails.
 
 Expected properties: `Name` (title), `Status` (must be `Published`), `Date`,
 `Description`, `ReadTime`, `Tags`.
@@ -52,9 +51,9 @@ That writes `public/posters/<name>.webp` from each clip's first frame. The cards
 reference it by deriving the path from the video, so there is no poster field to
 set and the still can never disagree with the video it stands in for.
 
-Videos use `preload="none"` — they only download on hover. `preload="metadata"`
-looks the same at rest but pulls the entire file (measured: 15.6MB across the
-three clips), which is what the posters exist to avoid.
+Videos use `preload="none"` and WebP posters. They load on hover, keyboard focus,
+or a touch tap on the Projects page, and stop when leaving the viewport.
+Posters keep the initial page load lightweight.
 
 ## SEO
 
@@ -69,20 +68,31 @@ Change the domain at the top of `make-sitemap.js` if it moves.
 
 ```
 src/
-  components/
-    DiffusionTransition.tsx   page transition over the page's real pixels
-    CommandPalette.tsx        ⌘K / "/" jump-to-anything
-    Rail.tsx                  left hairline nav, bottom bar on small screens
-    AmbientAudio.tsx          background track, starts on first interaction
-    ClickSound.tsx            click tick
-    CursorTrail.tsx           pixel trail behind the cursor
-  lib/
-    rasterize.ts              paints the live DOM to a canvas
-    click-sound.ts            Web Audio playback
-    nav.ts                    routes, key bindings
-  pages/
+  components/                 navigation, search, video previews, cursor trail
+  lib/                        route definitions and shared formatting helpers
+  pages/                      home, experience, projects, writing, articles
   data/                       jobs, projects, generated blog metadata
 ```
 
 Navigation is keyboard-first: `1`–`4` jump to sections, `j`/`k` step through
 them, `/` or `⌘K` opens the palette.
+
+## Design and maintenance
+
+The site is light-only, with a 640px content column, shared color tokens in
+`src/index.css`, and a single navigation definition in `src/lib/nav.ts`.
+Page headings are available to screen readers without adding visible titles.
+Keep project video behavior in `ProjectVideo.tsx` and use `SiteLink.tsx` for links
+that may point to either local articles or external sites.
+
+Markdown rendering and the command palette load only when needed. Article
+transitions use CSS and respect reduced-motion preferences; automatic video
+playback also respects that setting. The Home music shelf loads audio only after a cover is clicked. Cover palettes
+and track paths live in `src/data/music.ts`; assets live in `public/music`.
+Clicking the active cover pauses playback. Playback and the cover gradient persist across routes. The active track loops
+until paused by clicking its cover on Home.
+
+Run `npm run lint`, `npm run format:check`, and `npm run build` before committing.
+`npm run format` applies the repository's formatting. Poster generation requires
+FFmpeg. Blog refresh requires network access and the Notion credentials above;
+normal development and builds use the checked-in content.

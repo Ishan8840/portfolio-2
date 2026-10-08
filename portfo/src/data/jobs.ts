@@ -3,7 +3,6 @@ export type Job = {
   role: string;
   company: string;
   companyUrl: string;
-  companyColor: string;
   location: string;
   date: string;
   description: string;
@@ -18,7 +17,6 @@ export const jobs: Job[] = [
     role: "founding research engineer",
     company: "@preload",
     companyUrl: "https://preload.ai/",
-    companyColor: "bg-orange-200 hover:bg-orange-300 border-black",
     location: "San Francisco, CA",
     date: "Sept 2026 - Present",
     description: "teaching robots how humans move and feel",
@@ -33,7 +31,6 @@ export const jobs: Job[] = [
     role: "researcher",
     company: "uwaterloo",
     companyUrl: "https://uwaterloo.ca/",
-    companyColor: "bg-yellow-200 hover:bg-yellow-400 border-black",
     location: "Waterloo, ON",
     date: "Sept 2026 - Present",
     description: "non-prehensile manipulation",
@@ -46,7 +43,6 @@ export const jobs: Job[] = [
     role: "research engineer",
     company: "@axibo",
     companyUrl: "https://www.axibo.com/",
-    companyColor: "bg-red-300 hover:bg-red-400 border-black",
     location: "Cambridge, ON",
     date: "May 2026 - Sept 2026",
     description: "foundation models for humanoid manipulation",
@@ -61,7 +57,6 @@ export const jobs: Job[] = [
     role: "robotics researcher",
     company: "@wat.ai",
     companyUrl: "https://watai.ca/",
-    companyColor: "bg-yellow-200 hover:bg-yellow-400 border-black",
     location: "Waterloo, ON",
     date: "Jan 2026 - July 2026",
     description: "teaching robots with human preferences, not just rewards.",
@@ -78,7 +73,6 @@ export const jobs: Job[] = [
     role: "software engineer",
     company: "@ipmd",
     companyUrl: "https://ipmdinc.com",
-    companyColor: "bg-blue-200 hover:bg-blue-400 border-black",
     location: "San Mateo, CA",
     date: "July 2025 - Sept 2025",
     description: "worked on an ai-powered personal therapist",

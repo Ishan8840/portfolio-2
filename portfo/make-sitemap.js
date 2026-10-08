@@ -19,7 +19,9 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const read = (p) => fs.readFileSync(path.join(root, p), "utf8");
 
 // Cheap parse rather than importing TypeScript: this only needs the paths.
-const routes = [...read("src/lib/nav.ts").matchAll(/path:\s*"([^"]+)"/g)].map((m) => m[1]);
+const routes = [...read("src/lib/nav.ts").matchAll(/path:\s*"([^"]+)"/g)].map(
+  (m) => m[1],
+);
 if (!routes.length) throw new Error("no routes found in src/lib/nav.ts");
 
 let posts = [];
@@ -32,7 +34,10 @@ try {
 const iso = (d) => (/^\d{4}-\d{2}-\d{2}$/.test(d || "") ? d : null);
 
 const urls = [
-  ...routes.map((r) => ({ loc: SITE + r, priority: r === "/" ? "1.0" : "0.8" })),
+  ...routes.map((r) => ({
+    loc: SITE + r,
+    priority: r === "/" ? "1.0" : "0.8",
+  })),
   ...posts
     .filter((p) => p.slug)
     .map((p) => ({
@@ -54,7 +59,7 @@ const xml = [
       "  </url>",
     ]
       .filter(Boolean)
-      .join("\n")
+      .join("\n"),
   ),
   "</urlset>",
   "",
@@ -63,7 +68,7 @@ const xml = [
 fs.writeFileSync(path.join(root, "public/sitemap.xml"), xml);
 fs.writeFileSync(
   path.join(root, "public/robots.txt"),
-  `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`
+  `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`,
 );
 
 console.log(`sitemap.xml: ${routes.length} routes + ${posts.length} posts`);

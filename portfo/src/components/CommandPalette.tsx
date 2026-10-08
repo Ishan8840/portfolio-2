@@ -5,7 +5,12 @@ import { jobs } from "../data/jobs";
 import { projects } from "../data/projects";
 import postsData from "../data/blog-posts.json";
 
-type Post = { title: string; slug: string; description: string; tags: string[] };
+type Post = {
+  title: string;
+  slug: string;
+  description: string;
+  tags: string[];
+};
 
 type Item = {
   id: string;
@@ -82,6 +87,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -118,12 +124,13 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   // the dialog instead, and hand it back where it came from on close.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
+    inputRef.current?.focus();
     const onTab = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
       const root = dialogRef.current;
       if (!root) return;
       const focusable = root.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+        'a[href], button:not([disabled]):not([tabindex="-1"]), input, [tabindex]:not([tabindex="-1"])',
       );
       if (!focusable.length) return;
       const first = focusable[0];
@@ -154,7 +161,9 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const run = (item: Item) => {
     onClose();
     if (item.to) navigate(item.to);
-    else if (item.href?.startsWith("mailto:")) window.location.assign(item.href);
+    else if (item.href?.startsWith("/")) navigate(item.href);
+    else if (item.href?.startsWith("mailto:"))
+      window.location.assign(item.href);
     else if (item.href) window.open(item.href, "_blank", "noopener,noreferrer");
   };
 
@@ -167,7 +176,9 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       setActive((a) => (results.length ? (a + 1) % results.length : 0));
     } else if (e.key === "ArrowUp" || (e.key === "p" && e.ctrlKey)) {
       e.preventDefault();
-      setActive((a) => (results.length ? (a - 1 + results.length) % results.length : 0));
+      setActive((a) =>
+        results.length ? (a - 1 + results.length) % results.length : 0,
+      );
     } else if (e.key === "Enter") {
       e.preventDefault();
       const item = results[active];
@@ -192,7 +203,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
         <div className="flex items-center gap-3 border-b border-ink/10 px-4">
           <span className="font-mono text-xs text-subtle">▸</span>
           <input
-            autoFocus
+            ref={inputRef}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -203,7 +214,9 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
             role="combobox"
             aria-expanded
             aria-controls="palette-results"
-            aria-activedescendant={results[active] ? `palette-${results[active].id}` : undefined}
+            aria-activedescendant={
+              results[active] ? `palette-${results[active].id}` : undefined
+            }
             className="w-full bg-transparent py-4 font-mono text-sm text-ink outline-none placeholder:text-subtle"
           />
           <kbd className="font-mono text-[10px] uppercase tracking-wider text-subtle">
@@ -247,7 +260,9 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
                 <span className="block truncate text-sm font-semibold text-ink">
                   {item.label}
                 </span>
-                <span className="block truncate text-xs text-muted">{item.hint}</span>
+                <span className="block truncate text-xs text-muted">
+                  {item.hint}
+                </span>
               </span>
               <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-subtle">
                 {item.kind}

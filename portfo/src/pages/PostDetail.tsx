@@ -2,84 +2,92 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { motion } from "framer-motion";
 import ReadingProgress from "../components/ReadingProgress";
+import SiteLink from "../components/SiteLink";
+import posts from "../data/blog-posts.json";
 
 type State =
   | { status: "loading" }
   | { status: "ready"; body: string }
-  | { status: "missing" };
+  | { status: "missing" }
+  | { status: "error" };
 
-const PostDetail = () => {
+export default function PostDetail() {
   const { slug } = useParams();
   const [state, setState] = useState<State>({ status: "loading" });
+  const published = posts.some((post) => post.slug === slug);
 
   useEffect(() => {
-    // `ignore` rather than an AbortController: switching posts mid-flight should
-    // drop the stale response, and aborting would also surface as a rejection to
-    // handle. Without it a slow earlier fetch can land last and win.
-    let ignore = false;
-
-    fetch(`/posts/${slug}.md`)
+    if (!published) return;
+    const controller = new AbortController();
+    fetch(`/posts/${slug}.md`, { signal: controller.signal })
       .then(async (res) => {
-        // A 200 is not enough. vercel.json rewrites everything to /index.html,
-        // so an unknown slug answers with the app shell — which would otherwise
-        // be rendered as if it were the post's markdown.
-        const type = res.headers.get("content-type") || "";
-        if (!res.ok || type.includes("text/html")) throw new Error("not found");
-        return res.text();
-      })
-      .then((body) => {
-        if (!ignore) setState({ status: "ready", body });
+        // SPA hosting can answer unknown file paths with index.html and a 200.
+        if (
+          res.status === 404 ||
+          res.headers.get("content-type")?.includes("text/html")
+        ) {
+          if (!controller.signal.aborted) setState({ status: "missing" });
+          return;
+        }
+        if (!res.ok) throw new Error("Unable to load article");
+        const body = await res.text();
+        if (!controller.signal.aborted) setState({ status: "ready", body });
       })
       .catch(() => {
-        if (!ignore) setState({ status: "missing" });
+        if (!controller.signal.aborted) setState({ status: "error" });
       });
-
-    return () => {
-      ignore = true;
-    };
-  }, [slug]);
+    return () => controller.abort();
+  }, [slug, published]);
 
   return (
     <article className="page article-page">
-      {state.status === "ready" && <ReadingProgress />}
-      <div className="w-full">
-        {state.status === "missing" ? (
-          <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-            <p>no post at “{slug}”.</p>
-            <Link
-              to="/writing"
-              className="mt-3 inline-block border-b border-ink text-ink transition-colors hover:border-muted hover:text-muted"
-            >
-              back to writing
-            </Link>
-          </div>
-        ) : state.status === "ready" ? (
-          <motion.div
-            key={slug}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          >
+      {!published || state.status === "missing" ? (
+        <div className="page-message">
+          <h1>Article not found</h1>
+          <p>This article is no longer available.</p>
+          <Link to="/writing">← Back to writing</Link>
+        </div>
+      ) : state.status === "error" ? (
+        <div className="page-message" role="alert">
+          <h1>Couldn’t load this article</h1>
+          <p>Please check your connection and try again.</p>
+          <button onClick={() => window.location.reload()}>Try again</button>
+        </div>
+      ) : state.status === "loading" ? (
+        <p className="loading-state" role="status">
+          Loading article…
+        </p>
+      ) : (
+        <>
+          <ReadingProgress />
+          <div className="article-content">
             <div className="prose prose-neutral max-w-none article-prose">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{state.body}</ReactMarkdown>
-            </div>
-
-            {/* Outside the prose wrapper so typography styles don't reach it. */}
-            <div className="mt-16 border-t border-ink/10 pt-6">
-              <Link
-                to="/writing"
-                className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-ink"
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ children, href }) => (
+                    <SiteLink href={href}>{children}</SiteLink>
+                  ),
+                  img: ({ src, alt }) => (
+                    <img
+                      src={src}
+                      alt={alt ?? ""}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ),
+                }}
               >
-                ← back to writing
-              </Link>
+                {state.body}
+              </ReactMarkdown>
             </div>
-          </motion.div>
-        ) : null}
-      </div>
+            <div className="article-back">
+              <Link to="/writing">← Back to writing</Link>
+            </div>
+          </div>
+        </>
+      )}
     </article>
   );
-};
-
-export default PostDetail;
+}

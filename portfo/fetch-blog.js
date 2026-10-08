@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import { Client } from "@notionhq/client"; 
+import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 
 dotenv.config();
@@ -43,26 +43,29 @@ async function fetchMarkdown() {
   console.log("⏳ Fetching and converting to Markdown...");
 
   try {
-    const res = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${NOTION_KEY}`,
-        "Notion-Version": "2022-06-28",
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${NOTION_KEY}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filter: { property: "Status", status: { equals: "Published" } },
+        }),
       },
-      body: JSON.stringify({
-        filter: { property: "Status", status: { equals: "Published" } }
-      }),
-    });
+    );
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.message);
 
     const postsDir = path.join(__dirname, "public/posts");
     const dataDir = path.join(__dirname, "src/data");
-    
+
     // Ensure directories exist
-    [postsDir, dataDir].forEach(dir => {
+    [postsDir, dataDir].forEach((dir) => {
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     });
 
@@ -70,9 +73,13 @@ async function fetchMarkdown() {
 
     for (const page of data.results) {
       const title = page.properties.Name?.title[0]?.plain_text || "Untitled";
-      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-      const tags = page.properties.Tags?.multi_select?.map(tag => tag.name) || [];
-      
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      const tags =
+        page.properties.Tags?.multi_select?.map((tag) => tag.name) || [];
+
       console.log(`Converting: ${title}...`);
 
       const mdblocks = await n2m.pageToMarkdown(page.id);
@@ -85,18 +92,20 @@ async function fetchMarkdown() {
         title: title,
         slug: slug,
         date: page.properties.Date?.date?.start || "No Date",
-        readTime: page.properties.ReadTime?.rich_text[0]?.plain_text || "5 min read",
-        description: page.properties.Description?.rich_text[0]?.plain_text || "",
+        readTime:
+          page.properties.ReadTime?.rich_text[0]?.plain_text || "5 min read",
+        description:
+          page.properties.Description?.rich_text[0]?.plain_text || "",
         tags: tags,
-        color: HIGHLIGHTS[postMetadata.length % HIGHLIGHTS.length]
+        color: HIGHLIGHTS[postMetadata.length % HIGHLIGHTS.length],
       });
     }
 
     fs.writeFileSync(
       path.join(dataDir, "blog-posts.json"),
-      JSON.stringify(postMetadata, null, 2)
+      JSON.stringify(postMetadata, null, 2),
     );
-    
+
     console.log(`✅ Success! Generated ${postMetadata.length} markdown files.`);
   } catch (error) {
     console.error("❌ Error:", error.message);

@@ -1,37 +1,70 @@
-import { Suspense, lazy, useCallback, useEffect, useState, type PointerEvent } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useState,
+  type PointerEvent,
+} from "react";
+import {
+  Routes,
+  Route,
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 
 import AboutMe from "./pages/About";
 import Experience from "./pages/Experience";
 import Projects from "./pages/Projects";
 import Writing from "./pages/Writing";
+import MusicProvider from "./components/MusicProvider";
+import MusicAtmosphere from "./components/MusicAtmosphere";
 import Rail from "./components/Rail";
-import CommandPalette from "./components/CommandPalette";
+import posts from "./data/blog-posts.json";
 import CursorTrail from "./components/CursorTrail";
 import { NAV_KEYS, ROUTES, activeRouteIndex } from "./lib/nav";
 
 // Load the markdown renderer only when opening an article.
+const CommandPalette = lazy(() => import("./components/CommandPalette"));
 const PostDetail = lazy(() => import("./pages/PostDetail"));
 
-const HOVER_COLORS = ['#426c98', '#66784e', '#98624f', '#806293', '#956077', '#49756f'];
+const HOVER_COLORS = [
+  "#426c98",
+  "#66784e",
+  "#98624f",
+  "#806293",
+  "#956077",
+  "#49756f",
+];
 
 function randomizeLinkHover(event: PointerEvent<HTMLDivElement>) {
-  if (event.pointerType === 'touch' || !(event.target instanceof Element)) return;
-  const link = event.target.closest('a');
+  if (event.pointerType === "touch" || !(event.target instanceof Element))
+    return;
+  const link = event.target.closest("a");
   if (!link) return;
   // Moving between a link's text, icon, and video should keep the same color.
-  if (event.relatedTarget instanceof Node && link.contains(event.relatedTarget)) return;
-  const previous = link.style.getPropertyValue('--color-link-hover');
-  const choices = HOVER_COLORS.filter(color => color !== previous);
-  link.style.setProperty('--color-link-hover', choices[Math.floor(Math.random() * choices.length)]);
+  if (event.relatedTarget instanceof Node && link.contains(event.relatedTarget))
+    return;
+  const previous = link.style.getPropertyValue("--color-link-hover");
+  const choices = HOVER_COLORS.filter((color) => color !== previous);
+  link.style.setProperty(
+    "--color-link-hover",
+    choices[Math.floor(Math.random() * choices.length)],
+  );
 }
 
 function isTyping(el: EventTarget | null): boolean {
   const node = el as HTMLElement | null;
   if (!node || !node.tagName) return false;
   const tag = node.tagName;
-  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || node.isContentEditable;
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    node.isContentEditable
+  );
 }
 
 function App() {
@@ -39,7 +72,19 @@ function App() {
   const location = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const post = posts.find(
+      (post) => location.pathname === `/writing/${post.slug}`,
+    );
+    const section = ROUTES.find((route) => route.path === location.pathname);
+    const label = post?.title ?? section?.label ?? "Page not found";
+    document.title =
+      location.pathname === "/" ? "Ishan Shah" : `${label} — Ishan Shah`;
+  }, [location.pathname]);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
 
@@ -51,7 +96,14 @@ function App() {
         setPaletteOpen((v) => !v);
         return;
       }
-      if (paletteOpen || isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (
+        paletteOpen ||
+        isTyping(e.target) ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      )
+        return;
 
       if (e.key === "/") {
         e.preventDefault();
@@ -82,33 +134,53 @@ function App() {
   }, [navigate, location.pathname, paletteOpen]);
 
   return (
-    <div className="site-shell" onPointerOver={randomizeLinkHover}>
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <Rail onOpenPalette={openPalette} />
-      <CursorTrail />
-      {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
+    <MusicProvider>
+      <div className="site-shell" onPointerOver={randomizeLinkHover}>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <Rail onOpenPalette={openPalette} />
+        <CursorTrail />
+        <MusicAtmosphere />
+        {paletteOpen && (
+          <Suspense fallback={null}>
+            <CommandPalette onClose={() => setPaletteOpen(false)} />
+          </Suspense>
+        )}
 
-      <main id="main-content">
-        <Suspense fallback={<div className="page" role="status">Loading article…</div>}>
+        <main id="main-content" tabIndex={-1}>
+          <Suspense
+            fallback={
+              <div className="page" role="status">
+                Loading article…
+              </div>
+            }
+          >
             <Routes>
               <Route path="/" element={<AboutMe />} />
               <Route path="/experience" element={<Experience />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/writing" element={<Writing />} />
-              <Route path="/writing/:slug" element={<PostDetail key={location.pathname} />} />
+              <Route
+                path="/writing/:slug"
+                element={<PostDetail key={location.pathname} />}
+              />
               <Route
                 path="*"
                 element={
-                  <div className="flex min-h-screen items-center justify-center font-mono text-sm text-muted">
-                    404 — press ⌘K
+                  <div className="page page-message">
+                    <h1>Page not found</h1>
+                    <p>There’s nothing at this address.</p>
+                    <Link to="/">← Back home</Link>
                   </div>
                 }
               />
             </Routes>
           </Suspense>
-      </main>
-      <Analytics />
-    </div>
+        </main>
+        <Analytics />
+      </div>
+    </MusicProvider>
   );
 }
 

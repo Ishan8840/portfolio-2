@@ -30,10 +30,15 @@ if (!clips.length) {
 for (const clip of clips) {
   const out = path.join(posters, clip.replace(/\.mp4$/, ".webp"));
   execFileSync("ffmpeg", [
-    "-y", "-loglevel", "error",
-    "-i", path.join(videos, clip),
-    "-frames:v", "1",      // the very first frame, so it matches a paused video
-    "-quality", "82",
+    "-y",
+    "-loglevel",
+    "error",
+    "-i",
+    path.join(videos, clip),
+    "-frames:v",
+    "1", // the very first frame, so it matches a paused video
+    "-quality",
+    "82",
     out,
   ]);
   const kb = (fs.statSync(out).size / 1024).toFixed(0);
