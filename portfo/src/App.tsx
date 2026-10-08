@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState, type PointerEvent } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -13,6 +13,19 @@ import { NAV_KEYS, ROUTES, activeRouteIndex } from "./lib/nav";
 
 // Load the markdown renderer only when opening an article.
 const PostDetail = lazy(() => import("./pages/PostDetail"));
+
+const HOVER_COLORS = ['#426c98', '#66784e', '#98624f', '#806293', '#956077', '#49756f'];
+
+function randomizeLinkHover(event: PointerEvent<HTMLDivElement>) {
+  if (event.pointerType === 'touch' || !(event.target instanceof Element)) return;
+  const link = event.target.closest('a');
+  if (!link) return;
+  // Moving between a link's text, icon, and video should keep the same color.
+  if (event.relatedTarget instanceof Node && link.contains(event.relatedTarget)) return;
+  const previous = link.style.getPropertyValue('--color-link-hover');
+  const choices = HOVER_COLORS.filter(color => color !== previous);
+  link.style.setProperty('--color-link-hover', choices[Math.floor(Math.random() * choices.length)]);
+}
 
 function isTyping(el: EventTarget | null): boolean {
   const node = el as HTMLElement | null;
@@ -69,7 +82,7 @@ function App() {
   }, [navigate, location.pathname, paletteOpen]);
 
   return (
-    <div className="site-shell">
+    <div className="site-shell" onPointerOver={randomizeLinkHover}>
       <a className="skip-link" href="#main-content">Skip to content</a>
       <Rail onOpenPalette={openPalette} />
       <CursorTrail />

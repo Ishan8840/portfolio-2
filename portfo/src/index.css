@@ -7,6 +7,7 @@
   --color-surface: #ffffff;
   --color-muted: #656b6d;
   --color-subtle: #747b7d;
+  --color-link-hover: #426c98;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -16,7 +17,7 @@
   a, button { -webkit-tap-highlight-color: transparent; }
   button, summary { cursor: pointer; }
   a { transition: color 160ms, text-decoration-color 160ms; }
-  a:hover { color: #171a1a; }
+  a:hover { color: var(--color-link-hover); }
   :focus-visible { outline: 2px solid #667d83; outline-offset: 5px; border-radius: 2px; }
   ::selection { background: #dce7e6; color: #182528; }
 }
@@ -27,7 +28,7 @@
 .site-header nav { display: flex; gap: 24px; margin-left: auto; }
 .site-header nav a { color: var(--color-muted); font-size: 13px; padding-block: 8px; }
 .site-header nav a[aria-current="page"] { color: var(--color-ink); text-decoration: underline; text-underline-offset: 7px; text-decoration-color: #9ea8a8; }
-.site-header nav a:hover { color: var(--color-ink); }
+.site-header nav a:hover { color: var(--color-link-hover); }
 .search-trigger { color: var(--color-subtle); padding: 8px; margin-right: -8px; }
 .page { padding-top: 0; padding-bottom: 80px; }
 h1 { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -1px; }
@@ -36,7 +37,7 @@ h1 { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -1px; 
 .intro-copy { margin-top: 0; color: var(--color-muted); font-size: 17px; line-height: 1.85; }
 .intro-copy p + p { margin-top: 22px; }
 .intro-copy a { color: var(--color-ink); text-decoration: underline; text-decoration-color: #b8bfc0; text-underline-offset: 4px; }
-.intro-copy a:hover { text-decoration-color: var(--color-ink); }
+.site-shell a:hover, .intro-copy a:hover, .article-prose a:hover { color: var(--color-link-hover); text-decoration-color: currentColor; }
 .social-links { display: flex; align-items: center; flex-wrap: wrap; gap: 23px; margin-top: 27px; font-size: 14px; }
 .social-links span { font-size: 12px; color: #858e90; margin-left: 5px; }
 .home-section { margin-top: 67px; }
@@ -83,7 +84,7 @@ h1 { font-size: 30px; font-weight: 500; line-height: 1.3; letter-spacing: -1px; 
 .writing-meta { display: flex; gap: 16px; color: var(--color-subtle); font-size: 12px; }
 .writing-list h2 { margin-top: 11px; font-size: 18px; font-weight: 500; line-height: 1.5; display: flex; justify-content: space-between; gap: 16px; }
 .writing-list h2 span { font-size: 14px; color: var(--color-subtle); }
-.writing-list a:hover h2 { text-decoration: underline; text-decoration-color: #abb5b5; text-underline-offset: 4px; }
+.writing-list a:hover h2 { text-decoration: underline; text-decoration-color: currentColor; text-underline-offset: 4px; }
 .writing-list p { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--color-muted); }
 .empty-state { margin-block: 40px; color: var(--color-muted); }
 .empty-state button { text-decoration: underline; }

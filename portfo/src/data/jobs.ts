@@ -34,7 +34,7 @@ export const jobs: Job[] = [
     company: "uwaterloo",
     companyUrl: "https://uwaterloo.ca/",
     companyColor: "bg-yellow-200 hover:bg-yellow-400 border-black",
-    location: "",
+    location: "Waterloo, ON",
     date: "Sept 2026 - Present",
     description: "non-prehensile manipulation",
     bullets: [],
