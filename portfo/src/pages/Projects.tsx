@@ -28,7 +28,6 @@ export default function Projects() {
               </div>
             </div>
             <p>{project.description}</p>
-            <div className="tech-list">{project.tech.join(" · ")}</div>
           </article>
         ))}
       </div>

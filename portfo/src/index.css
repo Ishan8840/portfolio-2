@@ -264,12 +264,6 @@ h1 {
   font-size: 15px;
   line-height: 1.7;
 }
-.tech-list {
-  margin-top: 13px;
-  font-size: 12px;
-  color: var(--color-subtle);
-  line-height: 1.7;
-}
 .projects-list {
   display: flex;
   flex-direction: column;
