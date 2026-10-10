@@ -11,7 +11,7 @@ export default function MusicAtmosphere() {
           className="music-wash"
           data-active={selected === index && playing}
           style={{
-            background: `radial-gradient(ellipse at 0% 80%, ${track.colors[0]}63, transparent 67.5%), radial-gradient(ellipse at 100% 10%, ${track.colors[1]}4b, transparent 67.5%)`,
+            background: `radial-gradient(ellipse at 0% 80%, ${track.colors[0]}90, transparent 69%), radial-gradient(ellipse at 100% 10%, ${track.colors[1]}78, transparent 69%)`,
           }}
         />
       ))}
