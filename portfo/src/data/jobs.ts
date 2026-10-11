@@ -19,7 +19,7 @@ export const jobs: Job[] = [
     companyUrl: "https://preload.ai/",
     location: "San Francisco, CA",
     date: "Sept 2026 - Present",
-    description: "teaching robots how humans move and feel",
+    description: "force-aware robot learning from human demonstrations",
     bullets: [
       "Research using egocentric sEMG and force-feedback to train tactile manipulation policies.",
     ],
@@ -58,8 +58,8 @@ export const jobs: Job[] = [
     company: "@wat.ai",
     companyUrl: "https://watai.ca/",
     location: "Waterloo, ON",
-    date: "Jan 2026 - July 2026",
-    description: "teaching robots with human preferences, not just rewards.",
+    date: "Jan 2026 - Aug 2026",
+    description: "reinforcement learning from human feedback",
     bullets: [
       "Researching preference learning and human-feedback-driven optimization for sequential decision-making models.",
       "Implementing and evaluating learning pipelines in Python/PyTorch, collaborating with researchers on experimental design and analysis.",
@@ -75,7 +75,7 @@ export const jobs: Job[] = [
     companyUrl: "https://ipmdinc.com",
     location: "San Mateo, CA",
     date: "July 2025 - Sept 2025",
-    description: "worked on an ai-powered personal therapist",
+    description: "ai powered personal therapist",
     bullets: [
       "Replaced custom auth logic with Flask-JWT-Extended, centralizing token management across 10 endpoints and resolving registration edge cases.",
       "Modularized frontend by extracting 5+ reusable components, reducing code duplication by 30% and accelerating future feature development.",
