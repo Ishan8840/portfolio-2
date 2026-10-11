@@ -59,7 +59,7 @@ export const jobs: Job[] = [
     companyUrl: "https://watai.ca/",
     location: "Waterloo, ON",
     date: "Jan 2026 - Aug 2026",
-    description: "reinforcement learning from human feedback",
+    description: "vlm based preference learning",
     bullets: [
       "Researching preference learning and human-feedback-driven optimization for sequential decision-making models.",
       "Implementing and evaluating learning pipelines in Python/PyTorch, collaborating with researchers on experimental design and analysis.",
