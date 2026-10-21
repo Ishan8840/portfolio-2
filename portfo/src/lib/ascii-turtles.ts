@@ -477,7 +477,7 @@ export function startAsciiTurtles(
       const shimmerProgress = active
         ? clamp(
             (elapsed - active.start) /
-              (active.kind === "shimmer-dash" ? 1.2 : 2.2),
+              (active.kind === "shimmer-dash" ? 1.7 : 2.2),
             0,
             1,
           )
@@ -541,7 +541,7 @@ export function startAsciiTurtles(
             (active?.kind === "shimmer" || active?.kind === "shimmer-dash") &&
             onShell
               ? Math.exp(
-                  -(((localX - (0.8 - shimmerProgress * 1.6)) / 0.14) ** 2),
+                  -(((localX - (0.8 - shimmerProgress * 1.6)) / 0.22) ** 2),
                 ) * Math.sin(shimmerProgress * Math.PI)
               : 0;
           const alpha =
@@ -551,7 +551,7 @@ export function startAsciiTurtles(
                 fade * 0.23 +
                 illumination * 0.18 +
                 musicStrength * 0.33 +
-                glint * 0.5,
+                glint * 0.95,
             ) * coverage;
           // Fine ink characters retain the anatomy without heavy mosaic blocks.
           const ramp = ".:;itx%#@";
@@ -575,8 +575,13 @@ export function startAsciiTurtles(
             py +
             ((py - pointer.y) / directionLength) * push +
             Math.sin(angle) * scatter * 38;
-          const opacity = alpha * (0.6 + shade * 0.4);
-          ctx.fillStyle = `rgba(${pixels[i]}, ${pixels[i + 1]}, ${pixels[i + 2]}, ${opacity})`;
+          const opacity = Math.min(
+            1,
+            alpha * (0.6 + shade * 0.4) + glint * 0.18 * coverage,
+          );
+          // Preserve the sweep's contrast even when the album palette is already opaque.
+          const ink = 1 - glint * 0.5;
+          ctx.fillStyle = `rgba(${Math.round(pixels[i] * ink)}, ${Math.round(pixels[i + 1] * ink)}, ${Math.round(pixels[i + 2] * ink)}, ${opacity})`;
           ctx.fillText(glyph, x, y + (glyphOffsets.get(glyph) ?? 0));
         }
       }
@@ -625,9 +630,20 @@ export function startAsciiTurtles(
           reaction.kind === "dash" ||
           reaction.kind === "shimmer-dash"
         ) {
-          desiredX = Math.cos(turtle.heading);
-          desiredY = Math.sin(turtle.heading);
-          speedFactor = 1 + 3.2 * Math.exp(-age * 1.1);
+          // Flee the original click position, independent of later cursor movement.
+          const awayX = turtle.x - reaction.x;
+          const awayY = turtle.y - reaction.y;
+          const distance = Math.hypot(awayX, awayY);
+          if (distance > 4) {
+            desiredX = awayX / distance;
+            desiredY = awayY / distance;
+          }
+          const nearbyThreat = clamp(1 - distance / 220, 0, 1);
+          const escape = Math.max(
+            5 * Math.exp(-age * 0.85),
+            nearbyThreat * 3 * clamp((4 - age) / 1.2, 0, 1),
+          );
+          speedFactor = 1 + escape;
         } else if (reaction.kind === "follow") {
           const r = radiusOf(turtle) + 12;
           const distance = aim(
@@ -714,9 +730,13 @@ export function startAsciiTurtles(
       // Curve and acceleration share the same onset and decay, forming one dart.
       const dashCurve =
         dashing && reaction
-          ? reaction.dashDirection * 0.65 * Math.exp(-age * 1.1)
+          ? reaction.dashDirection * 0.25 * Math.exp(-age * 3)
           : 0;
-      let requestedTurn = clamp(turn * 1.2 + dashCurve, -0.9, 0.9);
+      let requestedTurn = clamp(
+        turn * (dashing ? 2 : 1.2) + dashCurve,
+        dashing ? -1.5 : -0.9,
+        dashing ? 1.5 : 0.9,
+      );
       const requestedSide =
         Math.abs(requestedTurn) > 0.08 ? Math.sign(requestedTurn) : 0;
       if (requestedSide && requestedSide !== turtle.steeringSide) {
@@ -802,6 +822,10 @@ export function startAsciiTurtles(
     onTrigger(kind, motion.matches);
     if (motion.matches) return;
     const turtle = turtles[index];
+    if (kind === "dash" || kind === "shimmer-dash") {
+      turtle.avoidanceSide = undefined;
+      turtle.steeringHoldUntil = elapsed;
+    }
     const clickSide =
       Math.cos(turtle.heading) * (y - turtle.y) -
       Math.sin(turtle.heading) * (x - turtle.x);
