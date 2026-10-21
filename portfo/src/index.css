@@ -596,22 +596,6 @@ h1 {
   }
 }
 
-/* Cover colors tint the page behind the content, without changing readability. */
-.music-atmosphere {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-}
-.music-wash {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 1200ms ease;
-}
-.music-wash[data-active="true"] {
-  opacity: 1;
-}
 .music-status {
   color: var(--color-subtle);
   font-size: 12px;
@@ -701,4 +685,14 @@ h1 {
   .music-control {
     opacity: 1;
   }
+}
+
+/* Transparent ASCII wildlife; links and scrolling remain fully interactive. */
+.ascii-turtles {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
 }

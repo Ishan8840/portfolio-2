@@ -10,7 +10,7 @@ export const music = [
     cover: "/music/indecision.png",
     audio:
       "/music/Rex Orange County feat. Daniel Caesar - Indecision (Official Video).mp3",
-    colors: ["#7197ad", "#889d77"],
+    colors: ["#628fbd", "#769fbd"],
   },
   {
     title: "The Hardest Part",

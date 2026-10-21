@@ -20,9 +20,9 @@ import Experience from "./pages/Experience";
 import Projects from "./pages/Projects";
 import Writing from "./pages/Writing";
 import MusicProvider from "./components/MusicProvider";
-import MusicAtmosphere from "./components/MusicAtmosphere";
 import Rail from "./components/Rail";
 import posts from "./data/blog-posts.json";
+import SwimmingTurtle from "./components/SwimmingTurtle";
 import CursorTrail from "./components/CursorTrail";
 import { NAV_KEYS, ROUTES, activeRouteIndex } from "./lib/nav";
 
@@ -141,7 +141,7 @@ function App() {
         </a>
         <Rail onOpenPalette={openPalette} />
         <CursorTrail />
-        <MusicAtmosphere />
+        <SwimmingTurtle />
         {paletteOpen && (
           <Suspense fallback={null}>
             <CommandPalette onClose={() => setPaletteOpen(false)} />
