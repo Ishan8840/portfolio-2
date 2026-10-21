@@ -4,6 +4,54 @@ import type { MusicPalette, RGB } from "./music-palette";
  * Inspired by the rendering approach in github.com/stackedlol/ascii-sharks;
  * turtle geometry, shading and movement are implemented here independently.
  */
+export const turtleEffects = [
+  {
+    id: "shimmer-dash",
+    label: "Shimmer + dash",
+    hint: "A shell highlight sweeps through a quick dash, then a gentle coast.",
+  },
+  {
+    id: "curious",
+    label: "Curious turn",
+    hint: "Turns toward you, pauses, then carries on.",
+  },
+  {
+    id: "dash",
+    label: "Startled dash",
+    hint: "A quick paddle and a short burst of speed.",
+  },
+  {
+    id: "scatter",
+    label: "ASCII scatter",
+    hint: "Characters drift apart and gather back together.",
+  },
+  {
+    id: "follow",
+    label: "Follow me",
+    hint: "Move your cursor; the turtle follows briefly.",
+  },
+  {
+    id: "shimmer",
+    label: "Shell shimmer",
+    hint: "One soft highlight sweeps across the shell.",
+  },
+  {
+    id: "companion",
+    label: "Companion moment",
+    hint: "The other turtle approaches and swims alongside.",
+  },
+] as const;
+export type TurtleEffect = (typeof turtleEffects)[number]["id"];
+const effectDuration: Record<TurtleEffect, number> = {
+  curious: 4,
+  dash: 4,
+  "shimmer-dash": 4,
+  scatter: 2.8,
+  follow: 7,
+  shimmer: 2.2,
+  companion: 14,
+};
+
 type TurtleAppearance = {
   bodyLength: number;
   bodyWidth: number;
@@ -19,10 +67,14 @@ type Turtle = {
   y: number;
   heading: number;
   phase: number;
+  strokeVelocity?: number;
   size: number;
   speed: number;
   velocity: number;
   turnSpeed: number;
+  avoidanceSide?: number;
+  steeringSide?: number;
+  steeringHoldUntil?: number;
   wander: number;
   wanderTarget: number;
   wanderAt: number;
@@ -247,6 +299,8 @@ function createTurtleTexture() {
 export function startAsciiTurtles(
   canvas: HTMLCanvasElement,
   getPalette: () => MusicPalette | null = () => null,
+  getEffect: () => TurtleEffect = () => "shimmer-dash",
+  onTrigger: (effect: TurtleEffect, reduced: boolean) => void = () => {},
 ) {
   const ctx = canvas.getContext("2d");
   const texture = createTurtleTexture();
@@ -260,6 +314,15 @@ export function startAsciiTurtles(
     last = 0,
     elapsed = 0;
   let turtles: Turtle[] = [];
+  let reaction: {
+    index: number;
+    kind: TurtleEffect;
+    start: number;
+    nextStroke: number;
+    dashDirection: number;
+    x: number;
+    y: number;
+  } | null = null;
   const pigments: { shell: RGB; skin: RGB }[] = [];
   let paletteTime = performance.now();
   let musicStrength = 0;
@@ -401,12 +464,26 @@ export function startAsciiTurtles(
         for (let channel = 0; channel < 3; channel++) {
           const target = base
             ? part === "shell"
-                ? base[channel] * 0.82
-                : base[channel] + (255 - base[channel]) * 0.25
+              ? base[channel] * 0.82
+              : base[channel] + (255 - base[channel]) * 0.25
             : turtle.appearance[part][channel];
           colors[part][channel] += (target - colors[part][channel]) * blend;
         }
       }
+      const active = reaction?.index === index ? reaction : null;
+      const progress = active
+        ? clamp((elapsed - active.start) / effectDuration[active.kind], 0, 1)
+        : 0;
+      const shimmerProgress = active
+        ? clamp(
+            (elapsed - active.start) /
+              (active.kind === "shimmer-dash" ? 1.2 : 2.2),
+            0,
+            1,
+          )
+        : 0;
+      const scatter =
+        active?.kind === "scatter" ? Math.sin(Math.PI * progress) ** 2 : 0;
       const size = turtle.size * (width < 700 ? 0.64 : 1);
       const radius = size * 1.3;
       const pixels = texture(
@@ -450,10 +527,31 @@ export function startAsciiTurtles(
           const cursorDistance = Math.hypot(px - pointer.x, py - pointer.y);
           const proximity = clamp(1 - cursorDistance / 16, 0, 1);
           const illumination = proximity * proximity * (3 - 2 * proximity);
+          const localX =
+            ((px - turtle.x) * Math.cos(turtle.heading) +
+              (py - turtle.y) * Math.sin(turtle.heading)) /
+            size;
+          const localY =
+            (-(px - turtle.x) * Math.sin(turtle.heading) +
+              (py - turtle.y) * Math.cos(turtle.heading)) /
+            size;
+          const onShell =
+            ((localX + 0.06) / 0.6) ** 2 + (localY / 0.44) ** 2 < 1;
+          const glint =
+            (active?.kind === "shimmer" || active?.kind === "shimmer-dash") &&
+            onShell
+              ? Math.exp(
+                  -(((localX - (0.8 - shimmerProgress * 1.6)) / 0.14) ** 2),
+                ) * Math.sin(shimmerProgress * Math.PI)
+              : 0;
           const alpha =
             Math.min(
               0.98,
-              0.56 - fade * 0.23 + illumination * 0.18 + musicStrength * 0.33,
+              0.56 -
+                fade * 0.23 +
+                illumination * 0.18 +
+                musicStrength * 0.33 +
+                glint * 0.5,
             ) * coverage;
           // Fine ink characters retain the anatomy without heavy mosaic blocks.
           const ramp = ".:;itx%#@";
@@ -465,8 +563,18 @@ export function startAsciiTurtles(
           // Repel individual glyphs without changing their font, density, or character.
           const push = motion.matches ? 0 : illumination * 12;
           const directionLength = Math.hypot(cursorDistance, 6);
-          const x = px + ((px - pointer.x) / directionLength) * push;
-          const y = py + ((py - pointer.y) / directionLength) * push;
+          const cellX = Math.round((px - turtle.x) / cw),
+            cellY = Math.round((py - turtle.y) / ch);
+          const seed = Math.sin(cellX * 127.1 + cellY * 311.7) * 43758.5453;
+          const angle = (seed - Math.floor(seed)) * Math.PI * 2;
+          const x =
+            px +
+            ((px - pointer.x) / directionLength) * push +
+            Math.cos(angle) * scatter * 38;
+          const y =
+            py +
+            ((py - pointer.y) / directionLength) * push +
+            Math.sin(angle) * scatter * 38;
           const opacity = alpha * (0.6 + shade * 0.4);
           ctx.fillStyle = `rgba(${pixels[i]}, ${pixels[i + 1]}, ${pixels[i + 2]}, ${opacity})`;
           ctx.fillText(glyph, x, y + (glyphOffsets.get(glyph) ?? 0));
@@ -480,6 +588,8 @@ export function startAsciiTurtles(
     const dt = Math.min((now - last) / 1000, 0.065);
     last = now;
     elapsed += dt;
+    if (reaction && elapsed - reaction.start >= effectDuration[reaction.kind])
+      reaction = null;
     const neighbors = turtles.map((turtle) => ({ ...turtle }));
     turtles.forEach((turtle, index) => {
       // Independent, slowly blended choices avoid a repeating patrol or jittery turns.
@@ -494,9 +604,57 @@ export function startAsciiTurtles(
         (turtle.paceTarget - turtle.pace) * (1 - Math.exp(-dt * 0.3));
       let desiredX = Math.cos(turtle.heading + turtle.wander);
       let desiredY = Math.sin(turtle.heading + turtle.wander);
+      let speedFactor = 1;
+      const age = reaction ? elapsed - reaction.start : 0;
+      const dashing =
+        reaction?.index === index &&
+        (reaction.kind === "dash" || reaction.kind === "shimmer-dash");
+      const aim = (x: number, y: number) => {
+        const dx = x - turtle.x,
+          dy = y - turtle.y;
+        const length = Math.hypot(dx, dy) || 1;
+        desiredX = dx / length;
+        desiredY = dy / length;
+        return length;
+      };
+      if (reaction?.index === index) {
+        if (reaction.kind === "curious" && age < 2.7) {
+          aim(reaction.x, reaction.y);
+          speedFactor = age < 1.5 ? 0.3 : 0.08;
+        } else if (
+          reaction.kind === "dash" ||
+          reaction.kind === "shimmer-dash"
+        ) {
+          desiredX = Math.cos(turtle.heading);
+          desiredY = Math.sin(turtle.heading);
+          speedFactor = 1 + 3.2 * Math.exp(-age * 1.1);
+        } else if (reaction.kind === "follow") {
+          const r = radiusOf(turtle) + 12;
+          const distance = aim(
+            clamp(pointer.x > 0 ? pointer.x : reaction.x, r, width - r),
+            clamp(pointer.y > 0 ? pointer.y : reaction.y, r, height - r),
+          );
+          speedFactor = clamp(distance / 100, 0.08, 1.35);
+        } else if (reaction.kind === "scatter") speedFactor = 0.15;
+      }
+      if (reaction?.kind === "companion") {
+        if (reaction.index === index) speedFactor = 0.6;
+        else {
+          const leader = neighbors[reaction.index];
+          const spacing = radiusOf(turtle) + radiusOf(leader) + 45;
+          const side = leader.x > width / 2 ? 1 : -1;
+          const distance = aim(
+            leader.x - Math.sin(leader.heading) * spacing * side,
+            leader.y + Math.cos(leader.heading) * spacing * side,
+          );
+          speedFactor = distance > 80 ? 1.35 : 0.65;
+        }
+      }
       const radius = radiusOf(turtle) + 12;
-      const lookX = turtle.x + Math.cos(turtle.heading) * turtle.velocity * 3;
-      const lookY = turtle.y + Math.sin(turtle.heading) * turtle.velocity * 3;
+      // Bound prediction so a dash cannot swing the avoidance target across the viewport.
+      const lookAhead = clamp(turtle.velocity * 2.5, 60, 120);
+      const lookX = turtle.x + Math.cos(turtle.heading) * lookAhead;
+      const lookY = turtle.y + Math.sin(turtle.heading) * lookAhead;
       const edgeRange = 80;
       desiredX +=
         Math.max(0, (radius + edgeRange - lookX) / edgeRange) * 3 -
@@ -534,30 +692,85 @@ export function startAsciiTurtles(
         desiredX += ((dx / distance) * 2.5 - (dy / distance) * 1.3) * avoid;
         desiredY += ((dy / distance) * 2.5 + (dx / distance) * 1.3) * avoid;
       });
-      const turn = Math.atan2(
+      let turn = Math.atan2(
         Math.sin(Math.atan2(desiredY, desiredX) - turtle.heading),
         Math.cos(Math.atan2(desiredY, desiredX) - turtle.heading),
       );
+      // Commit to one side of a large avoidance turn. Near 180 degrees, tiny
+      // target changes otherwise flip the shortest-turn sign on consecutive frames.
+      if (!turtle.avoidanceSide && Math.abs(turn) > 1.1) {
+        turtle.avoidanceSide =
+          Math.abs(turtle.turnSpeed) > 0.12
+            ? Math.sign(turtle.turnSpeed)
+            : Math.sign(turn) || (index === 0 ? 1 : -1);
+      }
+      if (turtle.avoidanceSide) {
+        if (Math.abs(turn) < 0.45) turtle.avoidanceSide = undefined;
+        else if (Math.sign(turn) !== turtle.avoidanceSide) {
+          turn += turtle.avoidanceSide * Math.PI * 2;
+        }
+      }
+      if (Math.abs(turn) < 0.035) turn = 0;
+      // Curve and acceleration share the same onset and decay, forming one dart.
+      const dashCurve =
+        dashing && reaction
+          ? reaction.dashDirection * 0.65 * Math.exp(-age * 1.1)
+          : 0;
+      let requestedTurn = clamp(turn * 1.2 + dashCurve, -0.9, 0.9);
+      const requestedSide =
+        Math.abs(requestedTurn) > 0.08 ? Math.sign(requestedTurn) : 0;
+      if (requestedSide && requestedSide !== turtle.steeringSide) {
+        if (elapsed < (turtle.steeringHoldUntil ?? 0)) {
+          // Coast out of the current turn instead of immediately counter-steering.
+          requestedTurn = 0;
+        } else {
+          turtle.steeringSide = requestedSide;
+          turtle.steeringHoldUntil = elapsed + 1.2;
+        }
+      }
       turtle.turnSpeed +=
-        (clamp(turn * 1.2, -0.7, 0.7) - turtle.turnSpeed) *
-        (1 - Math.exp(-dt * 2));
+        (requestedTurn - turtle.turnSpeed) *
+        (1 - Math.exp(-dt * (dashing ? 8 : 2)));
       turtle.heading += turtle.turnSpeed * dt;
       const stroke = swimStroke(turtle.phase);
       // Inertia carries the turtle between strokes; propulsion follows the paddles.
       const targetSpeed =
         turtle.speed *
         turtle.pace *
+        speedFactor *
         (0.65 + stroke.thrust * 1.2) *
-        (1 - caution * 0.55);
+        (1 - caution * 0.55) *
+        (1 - clamp((Math.abs(turn) - 0.8) / 1.8, 0, 1) * 0.5);
       // The power stroke gives a quick surge; drag eases it into a longer coast.
-      const response = targetSpeed > turtle.velocity ? 2.4 : 0.6;
+      const response =
+        targetSpeed > turtle.velocity
+          ? dashing
+            ? 8
+            : 2.4
+          : dashing
+            ? 1.6
+            : 0.6;
       turtle.velocity +=
         (targetSpeed - turtle.velocity) * (1 - Math.exp(-dt * response));
       const sway = Math.sin(turtle.phase - 0.4) * 0.012;
       turtle.x += Math.cos(turtle.heading + sway) * turtle.velocity * dt;
       turtle.y += Math.sin(turtle.heading + sway) * turtle.velocity * dt;
-      turtle.phase +=
-        dt * turtle.appearance.strokeRate * Math.sqrt(turtle.pace);
+      const baseRate = turtle.appearance.strokeRate * Math.sqrt(turtle.pace);
+      const recovering =
+        dashing && reaction && turtle.phase < reaction.nextStroke;
+      const desiredRate =
+        recovering && reaction
+          ? clamp(
+              (reaction.nextStroke - turtle.phase) / 0.45,
+              baseRate * 1.4,
+              baseRate * 2.6,
+            )
+          : baseRate * clamp(Math.sqrt(speedFactor), 0.5, dashing ? 1.9 : 1.6);
+      // Keep phase continuous and ease the cadence, including interrupted strokes.
+      turtle.strokeVelocity ??= baseRate;
+      turtle.strokeVelocity +=
+        (desiredRate - turtle.strokeVelocity) * (1 - Math.exp(-dt * 5));
+      turtle.phase += dt * turtle.strokeVelocity;
     });
     keepSpace();
     draw();
@@ -584,6 +797,85 @@ export function startAsciiTurtles(
     pointer.y = -1000;
     if (motion.matches) draw();
   };
+  const trigger = (index: number, x: number, y: number) => {
+    const kind = getEffect();
+    onTrigger(kind, motion.matches);
+    if (motion.matches) return;
+    const turtle = turtles[index];
+    const clickSide =
+      Math.cos(turtle.heading) * (y - turtle.y) -
+      Math.sin(turtle.heading) * (x - turtle.x);
+    reaction = {
+      dashDirection: clickSide >= 0 ? -1 : 1,
+      index,
+      kind,
+      start: elapsed,
+      nextStroke:
+        turtles[index].phase % (Math.PI * 2) < 0.35
+          ? turtles[index].phase
+          : (Math.floor(turtles[index].phase / (Math.PI * 2)) + 1) *
+            Math.PI *
+            2,
+      x,
+      y,
+    };
+  };
+  const click = (event: MouseEvent) => {
+    if (
+      event.target instanceof Element &&
+      event.target.closest("a, button, input, select, textarea, [role=dialog]")
+    )
+      return;
+    const rect = canvas.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * width;
+    const y = ((event.clientY - rect.top) / rect.height) * height;
+    for (const [index, turtle] of turtles.entries()) {
+      const size = turtle.size * (width < 700 ? 0.64 : 1);
+      const tx = Math.floor(
+        TEXTURE_SIZE / 2 + ((x - turtle.x) / size) * MODEL_SCALE,
+      );
+      const ty = Math.floor(
+        TEXTURE_SIZE / 2 + ((y - turtle.y) / size) * MODEL_SCALE,
+      );
+      if (tx < 0 || ty < 0 || tx >= TEXTURE_SIZE || ty >= TEXTURE_SIZE)
+        continue;
+      const pixels = texture(
+        turtle.phase,
+        turtle.heading,
+        turtle.appearance,
+        turtle.turnSpeed,
+      );
+      // Allow the gaps between ASCII glyphs and a small touch-friendly margin.
+      const tolerance = Math.ceil((10 / size) * MODEL_SCALE);
+      let hit = false;
+      for (
+        let sy = Math.max(0, ty - tolerance);
+        sy <= Math.min(TEXTURE_SIZE - 1, ty + tolerance) && !hit;
+        sy += 2
+      ) {
+        for (
+          let sx = Math.max(0, tx - tolerance);
+          sx <= Math.min(TEXTURE_SIZE - 1, tx + tolerance);
+          sx += 2
+        ) {
+          if (
+            (sx - tx) ** 2 + (sy - ty) ** 2 <= tolerance ** 2 &&
+            pixels[(sy * TEXTURE_SIZE + sx) * 4 + 3] > 30
+          ) {
+            hit = true;
+            break;
+          }
+        }
+      }
+      if (hit) {
+        pointer.x = x;
+        pointer.y = y;
+        trigger(index, x, y);
+        break;
+      }
+    }
+  };
+  window.addEventListener("click", click);
   const paletteChanged = () => {
     if (motion.matches) draw();
   };
@@ -599,6 +891,7 @@ export function startAsciiTurtles(
   return () => {
     cancelAnimationFrame(frame);
     canvas.removeEventListener("palettechange", paletteChanged);
+    window.removeEventListener("click", click);
     window.removeEventListener("resize", resize);
     window.removeEventListener("pointermove", move);
     window.removeEventListener("blur", leave);

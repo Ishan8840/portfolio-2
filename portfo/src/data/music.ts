@@ -16,12 +16,12 @@ export const music = [
     title: "The Hardest Part",
     cover: "/music/hardest_part.png",
     audio: "/music/Olivia Dean - The Hardest Part.mp3",
-    colors: ["#b65c91", "#ce9968"],
+    colors: ["#b65c91", "#9864ad"],
   },
   {
     title: "You",
     cover: "/music/you.png",
     audio: "/music/You (feat. Travis Scott).mp3",
-    colors: ["#a74335", "#b46b42"],
+    colors: ["#a74335", "#b65050"],
   },
 ];
