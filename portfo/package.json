@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node make-sitemap.js && tsc -b && vite build",
+    "build": "node make-sitemap.js && tsc -b && vite build && node scripts/build-article-previews.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "refresh-blog": "node fetch-blog.js",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@notionhq/client": "^5.9.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",

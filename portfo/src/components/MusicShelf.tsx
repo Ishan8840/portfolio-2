@@ -16,7 +16,7 @@ export default function MusicShelf() {
             ? "Loading…"
             : playing
               ? "Listening"
-              : "Click a cover to listen"}
+              : "Select a cover to listen"}
         </span>
       </div>
       <div className="music-shelf">

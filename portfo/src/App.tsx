@@ -84,6 +84,54 @@ function App() {
     const label = post?.title ?? section?.label ?? "Page not found";
     document.title =
       location.pathname === "/" ? "Ishan Shah" : `${label} — Ishan Shah`;
+    const description =
+      post?.description ??
+      "Research engineer working on foundation models for humanoid manipulation.";
+    const url = `https://ishanshah.org${location.pathname}`;
+    const image = post
+      ? `https://ishanshah.org/social/${post.slug}.png`
+      : "https://ishanshah.org/imgs/icon.png";
+    const metadata = {
+      description,
+      "og:title": document.title,
+      "og:description": description,
+      "og:type": post ? "article" : "website",
+      "og:url": url,
+      "og:image": image,
+      "og:image:alt": post?.title ?? "Ishan Shah",
+      "twitter:card": post ? "summary_large_image" : "summary",
+      "twitter:title": document.title,
+      "twitter:description": description,
+      "twitter:image": image,
+      "twitter:image:alt": post?.title ?? "Ishan Shah",
+    };
+    for (const [name, content] of Object.entries(metadata)) {
+      const attribute = name.startsWith("og:") ? "property" : "name";
+      let meta = document.head.querySelector<HTMLMetaElement>(
+        `meta[${attribute}="${name}"]`,
+      );
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute(attribute, name);
+        document.head.append(meta);
+      }
+      meta.content = content;
+    }
+    // Static article heads may remain mounted after navigating back to a section.
+    document.head
+      .querySelectorAll(
+        'meta[property^="article:"], meta[property="og:image:width"], meta[property="og:image:height"]',
+      )
+      .forEach((meta) => meta.remove());
+    let canonical = document.head.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]',
+    );
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.append(canonical);
+    }
+    canonical.href = url;
   }, [location.pathname]);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);

@@ -176,7 +176,7 @@ h1 {
 }
 .project-thumbnail {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
   overflow: hidden;
   border-radius: 7px;
   background: #e9ecea;
@@ -301,6 +301,19 @@ h1 {
 }
 .project-media video {
   display: block;
+  object-fit: cover;
+}
+.project-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+[data-playing="true"] > .project-poster {
+  opacity: 0;
 }
 .video-caption {
   position: absolute;
@@ -321,9 +334,33 @@ h1 {
 .project-media:focus-within .video-caption {
   opacity: 1;
 }
+.video-touch-hint {
+  display: none;
+}
 @media (hover: none) {
   .video-caption {
     opacity: 1;
+  }
+  .video-touch-hint {
+    display: block;
+    margin-top: 3px;
+    font-size: 11px;
+    color: rgb(255 255 255 / 0.8);
+  }
+  .site-header nav a,
+  .site-name,
+  .social-links a,
+  .project-heading a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .search-trigger {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .site-shell input[type="search"] {
+    font-size: 16px;
   }
 }
 .project-heading {

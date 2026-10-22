@@ -1,15 +1,4 @@
-/**
- * Generate a poster for every clip in public/videos from its own first frame.
- *
- * The <video> elements use preload="none", so without a poster they render an
- * empty box until hovered — but preload="metadata" costs the entire file
- * (measured: 15.6MB across the three clips, because the browser fetches the
- * whole resource rather than just the header). A frame-0 still gives the same
- * "paused video" look for ~30kB and, being taken from the clip itself, can
- * never disagree with it on framing or aspect ratio.
- *
- * Run after adding or replacing a video:  npm run posters
- */
+/** Generate curated, consistently sized video posters: npm run posters. */
 import { execFileSync } from "child_process";
 import fs from "fs";
 import path from "path";
@@ -18,6 +7,13 @@ import { fileURLToPath } from "url";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const videos = path.join(root, "public/videos");
 const posters = path.join(root, "public/posters");
+
+// Choose moments that explain the project before a visitor starts the clip.
+const posterFrames = {
+  "sharpa.mp4": 12.7, // Robot presenting the completed paper airplane.
+  "coffee.mp4": 19.5, // Both arms working together at the espresso machine.
+  "fold.mp4": 7, // Gripper and garment visible in both camera views.
+};
 
 fs.mkdirSync(posters, { recursive: true });
 
@@ -33,10 +29,14 @@ for (const clip of clips) {
     "-y",
     "-loglevel",
     "error",
+    "-ss",
+    String(posterFrames[clip] ?? 0),
     "-i",
     path.join(videos, clip),
     "-frames:v",
-    "1", // the very first frame, so it matches a paused video
+    "1",
+    "-vf",
+    "scale=960:540:force_original_aspect_ratio=increase,crop=960:540,setsar=1",
     "-quality",
     "82",
     out,
