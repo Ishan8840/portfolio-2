@@ -14,7 +14,7 @@ export function isPageClick(event: MouseEvent) {
     !(
       event.target instanceof Element &&
       event.target.closest(
-        'a, button, input, select, textarea, video, audio, label, summary, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="link"], [role="dialog"]',
+        'a, button, input, select, textarea, video, audio, label, summary, [contenteditable]:not([contenteditable="false"]), [role="button"], [role="link"], [role="dialog"], [role="scrollbar"]',
       )
     )
   );

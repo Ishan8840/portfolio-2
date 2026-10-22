@@ -738,13 +738,57 @@ h1 {
   z-index: 400;
 }
 
-@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
-  html.quiet-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    transition: scrollbar-color 240ms ease;
-  }
-  html.quiet-scrollbar.scrollbar-visible {
-    scrollbar-color: #a3ada7 transparent;
-  }
+/* Keep touch and forced-colors scrolling native. */
+html.ascii-scrollbar-enabled {
+  scrollbar-width: none;
+}
+html.ascii-scrollbar-enabled::-webkit-scrollbar {
+  display: none;
+}
+.ascii-scrollbar {
+  position: fixed;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  height: min(340px, 55vh);
+  width: 44px;
+  z-index: 400;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  color: #7b8b80;
+}
+.ascii-scrollbar-marks {
+  position: absolute;
+  inset: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.ascii-scrollbar-row {
+  position: relative;
+  height: 0;
+}
+.ascii-scrollbar-row > span {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translateY(-50%);
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: right;
+  font:
+    11px/8px ui-monospace,
+    Menlo,
+    Consolas,
+    monospace;
+  letter-spacing: -1px;
+}
+.ascii-scrollbar:hover,
+.ascii-scrollbar:focus-visible {
+  color: #536d5c;
+}
+.ascii-scrollbar.is-dragging {
+  cursor: grabbing;
 }

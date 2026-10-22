@@ -25,7 +25,7 @@ import posts from "./data/blog-posts.json";
 import SwimmingTurtle from "./components/SwimmingTurtle";
 import CursorTrail from "./components/CursorTrail";
 import AsciiRipple from "./components/AsciiRipple";
-import QuietScrollbar from "./components/QuietScrollbar";
+import AsciiScrollGrip from "./components/AsciiScrollGrip";
 import { NAV_KEYS, ROUTES, activeRouteIndex } from "./lib/nav";
 
 // Load the markdown renderer only when opening an article.
@@ -193,7 +193,7 @@ function App() {
         <CursorTrail />
         <SwimmingTurtle />
         <AsciiRipple />
-        <QuietScrollbar />
+        <AsciiScrollGrip />
         {paletteOpen && (
           <Suspense fallback={null}>
             <CommandPalette onClose={() => setPaletteOpen(false)} />

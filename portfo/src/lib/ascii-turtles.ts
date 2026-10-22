@@ -779,7 +779,9 @@ export function startAsciiTurtles(
   const click = (event: MouseEvent) => {
     if (
       event.target instanceof Element &&
-      event.target.closest("a, button, input, select, textarea, [role=dialog]")
+      event.target.closest(
+        "a, button, input, select, textarea, [role=dialog], [role=scrollbar]",
+      )
     )
       return;
     const rect = canvas.getBoundingClientRect();
