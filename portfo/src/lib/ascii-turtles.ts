@@ -1,4 +1,5 @@
 import type { MusicPalette, RGB } from "./music-palette";
+import { turtleClicks } from "./click-effects";
 
 /** Procedural turtle silhouettes sampled onto an upright ASCII grid.
  * Inspired by the rendering approach in github.com/stackedlol/ascii-sharks;
@@ -823,6 +824,7 @@ export function startAsciiTurtles(
         }
       }
       if (hit) {
+        turtleClicks.add(event);
         pointer.x = x;
         pointer.y = y;
         trigger(index, x, y);
