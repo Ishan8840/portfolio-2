@@ -21,7 +21,7 @@ export default function Rail({ onOpenPalette }: { onOpenPalette: () => void }) {
               to={route.path}
               aria-current={active === i ? "page" : undefined}
             >
-              {route.label}
+              {route.label.toLowerCase()}
             </Link>
           ),
         )}
