@@ -14,7 +14,7 @@ export default function Projects() {
               <h2>{project.title}</h2>
               <div>
                 {[
-                  ["Website", project.website],
+                  [project.websiteLabel ?? "Website", project.website],
                   ["Code", project.github],
                   ["Demo", project.demo],
                   ["X", project.twitter],

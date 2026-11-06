@@ -10,6 +10,7 @@ const posters = path.join(root, "public/posters");
 
 // Choose moments that explain the project before a visitor starts the clip.
 const posterFrames = {
+  "deep-learning.mp4": 1, // Opening title with the complete learning timeline.
   "sharpa.mp4": 12.7, // Robot presenting the completed paper airplane.
   "coffee.mp4": 19.5, // Both arms working together at the espresso machine.
   "fold.mp4": 7, // Gripper and garment visible in both camera views.

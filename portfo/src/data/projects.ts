@@ -9,9 +9,23 @@ export type Project = {
   demo?: string;
   twitter?: string;
   website?: string;
+  websiteLabel?: string;
 };
 
 export const projects: Project[] = [
+  {
+    id: 4,
+    title: "deep dive into deep learning",
+    description:
+      "diving into the foundations of robot learning and reimplementing the core breakthroughs from scratch",
+    video: "/videos/deep-learning.mp4",
+    caption: "From pixels to action. Still learning.",
+    tech: [],
+    website: "https://ishan8840.github.io/deep-learning-notes/",
+    websiteLabel: "Notes",
+    github: "https://github.com/Ishan8840/deep-learning",
+    twitter: "https://x.com/IshanShahh/status/2118769130983551218",
+  },
   {
     id: 3,
     title: "origami challenge - IROS 2026",
@@ -31,6 +45,7 @@ export const projects: Project[] = [
     caption: "A 2-minute coffee routine.",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "/writing/working-with-vlas-training-inference",
+    websiteLabel: "Notes",
   },
   {
     id: 1,
@@ -41,5 +56,6 @@ export const projects: Project[] = [
     caption: "Learning to fold with π₀.₅.",
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "/writing/working-with-vlas-training-inference",
+    websiteLabel: "Notes",
   },
 ];
