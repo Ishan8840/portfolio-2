@@ -6,11 +6,10 @@ export const music = [
     colors: ["#a57b45", "#7c5539"],
   },
   {
-    title: "Indecision",
-    cover: "/music/indecision.png",
-    audio:
-      "/music/Rex Orange County feat. Daniel Caesar - Indecision (Official Video).mp3",
-    colors: ["#628fbd", "#769fbd"],
+    title: "Superposition",
+    cover: "/music/superposition.png",
+    audio: "/music/superposition.mp3",
+    colors: ["#7795aa", "#91a6b9"],
   },
   {
     title: "The Hardest Part",
