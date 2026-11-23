@@ -1,28 +1,26 @@
 # TinyDreamer
 
-I built a Dreamer-style agent with roughly $550{,}000$ parameters to understand how a policy learns by acting in imagination. While reading the Dreamer papers, I kept coming back to one question: could an agent learn when to trust its own imagined states?
+In Breakout, the ball hits a brick and the game awards a point. I could replay the same actions inside my world model, watch it draw a plausible game of Breakout, and still see it miss the point. That mistake mattered twice. During training, that imagined reward helped shape both the actor’s choice of actions and the critic’s estimate of what a position was worth.
+
+I built TinyDreamer, a roughly $550{,}000$-parameter Dreamer-style agent, to understand how a policy learns from games played in imagination. The missed brick gave me a more specific question. Could the agent tell which parts of an imagined game it should trust?
 
 ## Following one imagined decision
 
-I built TinyDreamer in JAX and trained a separate agent for each of the five MinAtar games. Breakout was the easiest place to follow a decision. I could watch the ball hit a brick in the real game, replay the same actions in the world model, and check whether it predicted the point on the right step.
+I wrote the agent in JAX and trained separate weights for each of the five MinAtar games. To follow a decision in Breakout, start with a few frames from the real game. The tokenizer compresses each screen into a vector, or *latent*. The actor chooses an action, and the world model predicts three things: the next latent, the reward, and the probability that the episode continues. On the next imagined step, the model has to work with the latent it just produced. A small error in the ball’s position can become part of the history behind every subsequent prediction.
 
-The tokenizer compressed each screen into a vector called a latent. Starting from a short history of real latents, the actor chose an action. The world model then predicted the next latent, the reward, and the probability that the game would continue. If the model missed a brick hit, the actor could learn from the wrong reward even when the rest of the predicted screen looked right.
-
-Click a component to follow the tensors through it and see how it is trained. In the tokenizer, you can edit the latent for a recorded Breakout frame and watch the reconstruction change.
+You can follow that path through the diagram below. Open the tokenizer to change the latent of a recorded Breakout frame and see what the decoder draws.
 
 [Interactive TinyDreamer architecture](/writing-assets/tiny-dreamer/explorer/)
 
-## The changes that mattered
+## Keeping the ball on track
 
-**Attention normalization helped over longer rollouts.** I tried QKNorm, which normalizes the queries and keys in each attention head. On the same Breakout starting points, the share of $20$-step rollouts that matched the real game at every frame rose from **$18.6\%$ to $27.5\%$**. Seeing the improvement over a whole trajectory convinced me to keep a change that added only two learned parameters.
+I started with a demanding test. Given the same starting frames and actions as the real game, how often could the model get *every frame* right for $20$ steps? Adding QKNorm, which normalizes the queries and keys in each attention head, raised that rate from **$18.6\%$ to $27.5\%$** on the same Breakout starting points. Most rollouts still contained a mistake, but two extra learned parameters bought enough additional perfect trajectories that I kept them.
 
-**Rare rewards were easy to miss in training.** In the five-game run, I sampled $16$ transitions with a positive reward and $48$ with zero reward for each reward-head update. I weighted the examples to account for how often each group occurred in replay. Compared with earlier runs that sampled transitions at their natural frequencies, the largest score increases were in Space Invaders (from $26.16$ to $52.32$ points) and Breakout (from $9.48$ to $14.39$).
+I also changed what the model saw during training. My first world model learned from random play. As the actor improved, it visited situations that appeared infrequently in that dataset. I let the actor play real games and added those transitions to replay for the world model. The actor and critic continued to learn from imagined trajectories.
 
-**The world model needed experience from the current policy.** I initially trained the world model on games played by a random policy. As the actor improved, it began visiting states that were rare in those games. I added online collection: the actor played in the real environment, and I added those transitions to replay so the world model could learn from them. The actor and critic still trained on imagined trajectories.
+Reward events posed a different sampling problem. A replay window could contain plenty of movement and very few points. In the five-game run, each reward-head update drew $16$ positive-reward transitions and $48$ zero-reward transitions, with weights accounting for each group’s frequency in replay. Compared with the earlier runs using natural frequencies, the largest score increases were in Space Invaders, from $26.16$ to $52.32$, and Breakout, from $9.48$ to $14.39$.
 
-**Diffusion forcing.** I wondered whether a predictor that had only seen clean frames could recover once the ball drifted during imagination. I tried diffusion forcing: during training, I made some frames in its history noisier than others. I wanted to see whether the ball stayed on track farther into a rollout.
-
-I replayed the same Breakout actions from the same starting positions with both models. At each horizon, I measured how far the predicted ball was from its real position, in grid cells. Smaller errors are better.
+Even with better coverage, an imagined history gradually fills with the model’s own errors. I tried *diffusion forcing* to give the predictor practice with imperfect histories: during training, individual frames in its context received different amounts of noise. I then replayed the same Breakout actions from the same starting positions and measured the mean distance, in grid cells, between the imagined ball and the real one.
 
 | Frames ahead | Clean-history training | Diffusion forcing |
 | ------------ | -------: | ----------------: |
@@ -31,22 +29,24 @@ I replayed the same Breakout actions from the same starting positions with both 
 | $+10$ frames |   $4.57$ |            $3.60$ |
 | $+20$ frames |   $4.97$ |            $3.80$ |
 
-In this Breakout test, diffusion forcing slightly increased ball-position error at the first two horizons and reduced it at the longer two. That gave me a reason to evaluate whole rollouts. A one-step comparison would have missed the improvement.
+At one frame ahead, the clean-history model placed the ball slightly closer to its real position. At $20$ frames, diffusion forcing brought the error down by more than a full grid cell. If I’d stopped the comparison after the next frame, I would have chosen the model that lost track of the ball by the wider margin later on.
 
-## Teaching a separate head to predict rollout error
+## Could the model tell when it was wrong?
 
-In Asterix, I wanted to know whether the model could recognize its own mistakes. I replayed recorded actions and compared each predicted latent with the latent the tokenizer produced from the corresponding real frame. That difference gave me a target for a small error predictor, or probe. On fresh episodes, the probe had to estimate the error before it saw the real frame.
+The Breakout comparison let me measure drift after the game. During imagination, the actor has to choose its next action before it gets to see the real frame. In Asterix, I trained a small prediction head, or *probe*, to estimate how far an imagined latent had drifted. To give it a training target, I replayed recorded actions, encoded the real frame at each step, and measured the mean squared error (MSE) between that latent and the predicted one.
 
-Did the probe flag steps where the model made bigger mistakes? Across $512$ fresh episodes, I grouped predictions by the probe’s estimated risk at the third imagined step. Latent mean squared error (MSE) was higher in the high-risk group, and the model more often missed a coin pickup or predicted one that never happened. Actual pickups were also more common in that group. Cutting off every high-risk rollout could discard some of the most useful examples.
+I tested the probe on $512$ fresh episodes. At the third imagined step, I split the predictions into groups using the risk the probe estimated before seeing the real frame. Then I checked two things against the recording: how far the latent had drifted, and whether the model had missed a coin pickup or invented one.
 
 | Metric at step $3$ | Low predicted risk | High predicted risk |
 | --- | ---: | ---: |
 | Actual latent MSE | $0.814$ | $1.415$ |
 | Coin-event mistakes | $0.65\%$ | $2.00\%$ |
 
-I compared three ways to train the policy: always use five imagined steps, stop at the first high-error step, or reduce each step’s weight as predicted error rises. For the last approach, I used a sigmoid that assigned a trust weight of $0.90$ at a predicted MSE of $0.887$ and $0.50$ at $1.214$. Lower trust moved the return target closer to the critic’s current estimate and gave that step less influence on both the actor and the critic.
+The probe picked out a group with larger latent errors and roughly three times the rate of coin-event mistakes. But real pickups were also more common in that group. A rule that stopped imagination whenever the probe flagged a step could throw away the moment the actor was trying to learn about.
 
-To see how those rules affected play, I compared the points each policy earned in real Asterix episodes.
+I compared three ways to handle that uncertainty. One policy always trained on five imagined steps. A second stopped at the first step the probe flagged. A third kept the step and reduced its influence gradually. For that last policy, a sigmoid gave a predicted MSE of $0.887$ a trust weight of $0.90$. At $1.214$, the weight fell to $0.50$. As trust fell, the return target moved closer to the critic’s existing estimate, reducing the influence of the imagined outcome on both the actor and the critic.
+
+I took all three policies back into real Asterix games and measured the points they earned per episode.
 
 | Rule used in training | Mean points per episode |
 | ------------------------ | ------------------: |
@@ -54,11 +54,11 @@ To see how those rules affected play, I compared the points each policy earned i
 | Hard cutoff              |             $1.027$ |
 | Soft weighting           |             $2.52$ |
 
-With this training seed, soft weighting scored higher than the hard cutoff. My interpretation is that even an uncertain step can contain useful information about a pickup.
+With this seed, the hard cutoff scored about the same as always taking five steps. Soft weighting reached $2.52$ points per episode. My reading is that the probe could identify a difficult prediction while the imagined transition still carried information worth learning from.
 
-## Results
+## Taking the policies back into the games
 
-I evaluated both policies in the real games. Each row shows mean points per episode for one game. The five games award points differently, so read across each row to see how much the trained policy gained over random play.
+The final test was to let each imagination-trained policy control the real game. Each row compares its mean points per episode with a random policy playing under the same scoring system.
 
 | Game | Random policy | Imagination-trained policy |
 | -------------- | -----: | -------: |
@@ -68,11 +68,13 @@ I evaluated both policies in the real games. Each row shows mean points per epis
 | Asterix        |   0.55 |    2.52 |
 | Seaquest       |   0.11 |     1.82 |
 
+All five policies beat random play. The scores also put the earlier experiments in perspective. In Breakout, I could follow a single missed reward all the way back to the ball’s position. In Asterix, even the best of the three imagination rules averaged only a few points per game. Knowing where the model was unreliable helped me decide how much weight to give its predictions. It still left the actor with a hard game to learn.
+
 ## Conclusion
 
-Tracing a missed point in Breakout helped me understand how learning in imagination works. An error in the imagined ball position can change the predicted reward, which changes the return the critic learns to predict and the feedback the actor receives. In Asterix, the probe gave me a partial answer to my original question: the agent could identify riskier imagined steps, but some of those steps were also where it had the most to learn.
+Before building TinyDreamer, I understood the Dreamer loop well enough to sketch it. What I learned by implementing it was how to debug a decision inside that loop. For a missed point, I could check the encoded screen, follow the ball through the imagined frames, and see which reward reached the critic. The Asterix probe gave me a partial answer to the question that started the project: the model could flag steps where its predictions tended to be worse, and in this run the actor did better when it could still learn from them.
 
-The biggest question I didn’t get to test was scaling. With a larger world model, I’d want to know how many more steps the actor could reliably imagine and how long each decision would take. That trade-off matters in a game or any other task where the agent has to act in real time.
+Scaling is the experiment I didn’t get to run. I’d start larger world models from the same recorded positions and measure how far each could imagine before it misplaced a ball or missed a pickup. Then I’d time those rollouts. That would tell me what a larger model actually buys the actor: how many more steps of useful experience it can generate, and what each one costs.
 
 ## Sources
 
