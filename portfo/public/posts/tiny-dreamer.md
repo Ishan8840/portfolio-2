@@ -58,7 +58,11 @@ With this seed, the hard cutoff scored about the same as always taking five step
 
 ## Taking the policies back into the games
 
-The final test was to let each imagination-trained policy control the real game. Each row compares its mean points per episode with a random policy playing under the same scoring system.
+The final test was to let each imagination-trained policy control the real game. These recordings show one episode per game from the five-game training run.
+
+[Breakout](/writing-assets/tiny-dreamer/rollouts/breakout.mp4) [Freeway](/writing-assets/tiny-dreamer/rollouts/freeway.mp4) [Space Invaders](/writing-assets/tiny-dreamer/rollouts/space-invaders.mp4) [Asterix](/writing-assets/tiny-dreamer/rollouts/asterix.mp4) [Seaquest](/writing-assets/tiny-dreamer/rollouts/seaquest.mp4)
+
+Each row compares its mean points per episode with a random policy playing under the same scoring system.
 
 | Game | Random policy | Imagination-trained policy |
 | -------------- | -----: | -------: |
@@ -78,13 +82,8 @@ Scaling is the experiment I didn’t get to run. I’d start larger world models
 
 ## Sources
 
-**Implementation**
-
-[TinyDreamer on GitHub](https://github.com/Ishan8840/tiny-dreamer)
-
-**Research papers**
-
-- **Dreamer** · [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603)
-- **DreamerV2** · [Mastering Atari with Discrete World Models](https://arxiv.org/abs/2010.02193)
-- **DreamerV3** · [Mastering diverse control tasks through world models](https://doi.org/10.1038/s41586-025-08744-2)
-- **Dreamer 4** · [Training Agents Inside of Scalable World Models](https://arxiv.org/abs/2509.24527)
+- **Code** [TinyDreamer on GitHub](https://github.com/Ishan8840/tiny-dreamer)
+- **Dreamer** [Dream to Control: Learning Behaviors by Latent Imagination](https://arxiv.org/abs/1912.01603)
+- **DreamerV2** [Mastering Atari with Discrete World Models](https://arxiv.org/abs/2010.02193)
+- **DreamerV3** [Mastering diverse control tasks through world models](https://doi.org/10.1038/s41586-025-08744-2)
+- **Dreamer 4** [Training Agents Inside of Scalable World Models](https://arxiv.org/abs/2509.24527)

@@ -71,6 +71,11 @@ export default function PostDetail() {
                 remarkPlugins={slug === "tiny-dreamer" ? [remarkGfm, remarkMath] : [remarkGfm]}
                 rehypePlugins={slug === "tiny-dreamer" ? [rehypeKatex] : []}
                 components={{
+                  h2: ({ children }) => (
+                    <h2 id={slug === "tiny-dreamer" && children === "Sources" ? "sources" : undefined}>
+                      {children}
+                    </h2>
+                  ),
                   table: ({ children }) => (
                     <div className="article-table-scroll">
                       <table>{children}</table>
@@ -78,6 +83,11 @@ export default function PostDetail() {
                   ),
                   a: ({ children, href }) => slug === "tiny-dreamer" && href === explorerUrl ? (
                     <TinyDreamerExplorer />
+                  ) : slug === "tiny-dreamer" && href?.startsWith("/writing-assets/tiny-dreamer/rollouts/") ? (
+                    <span className="rollout-clip">
+                      <video src={href} aria-label={`${children} agent rollout`} autoPlay muted loop playsInline preload="metadata" />
+                      <span>{children}</span>
+                    </span>
                   ) : (
                     <SiteLink href={href}>{children}</SiteLink>
                   ),

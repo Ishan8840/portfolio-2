@@ -591,6 +591,28 @@ h1 {
   outline: 2px solid #667d83;
   outline-offset: 5px;
 }
+.article-prose p:has(> .rollout-clip) {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(6.25rem, 1fr);
+  gap: 0.625rem;
+  overflow-x: auto;
+}
+.rollout-clip {
+  display: grid;
+  gap: 0.4rem;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}
+.article-prose .rollout-clip video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  border: 1px solid var(--color-divider);
+  image-rendering: pixelated;
+}
 .article-table-scroll {
   margin-block: 1em 1.65em;
   overflow-x: auto;
@@ -627,6 +649,38 @@ h1 {
 }
 .article-table-scroll tbody tr:last-child {
   border-bottom: 0;
+}
+.article-prose #sources {
+  margin-bottom: 0.75rem;
+}
+.article-prose #sources + ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.article-prose #sources + ul li {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.3rem 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.article-prose #sources + ul strong {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 450;
+}
+.article-prose #sources + ul a {
+  justify-self: start;
+  font-weight: 400;
+  text-decoration-color: var(--color-divider);
+  text-underline-offset: 0.2em;
+}
+.article-prose #sources + ul a:hover {
+  text-decoration-color: currentColor;
 }
 .article-back {
   margin-top: 64px;
