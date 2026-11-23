@@ -11,32 +11,45 @@ npm run build    # typecheck + production build
 npm run lint
 ```
 
-## Blog
+## Writing
 
-Posts live in a Notion database and are pulled in as markdown.
+Edit Markdown files in `content/writing/`. The initial `Working With VLAs/`
+folder is a copy of the Obsidian notes; editing it does not change the vault.
+Subfolders are supported. Every article starts with YAML metadata:
 
-```bash
-npm run refresh-blog
+```yaml
+---
+title: "My article"
+slug: "my-article"
+date: "2026-11-22"
+description: "A short description for the writing list and link previews."
+tags: [robot-learning]
+---
+# My article
+
+Write the article here.
 ```
 
-This writes one `public/posts/<slug>.md` per post plus the listing metadata in
-`src/data/blog-posts.json`. Both are committed, so the deployed site serves what
-was last fetched — not whatever is currently live in Notion.
+`title`, `date`, and `description` are required. `slug` is optional (defaults to
+its filename), but keep it stable once published so existing links keep working.
+`tags` are optional and used for search. Add `draft: true` to exclude a post.
+Reading time is calculated automatically. Posts appear newest first.
 
-It needs a `.env` in this directory:
+`npm run dev` and `npm run build` sync the folder automatically. While the dev
+server is running, editing, adding, or deleting Markdown refreshes the preview.
+You can also run `npm run refresh-blog` to sync manually—this now reads local
+files and makes no Notion requests.
 
-```
-NOTION_KEY=...            # integration secret from notion.so/my-integrations
-NOTION_DATABASE_ID=...    # the 32-char id in the database URL
-```
+Obsidian links such as `[[Working With VLAs - Data|Data]]` become internal article
+links. Vault paths in those links are resolved by note filename. Standard
+Markdown links also work; use `/writing/<slug>` for internal links. Put images in
+`public/writing-assets/` and reference `/writing-assets/<filename>` in Markdown.
 
-The database must also be shared with the integration (`···` → Connections). Check both the credentials and database access if the request fails.
-
-Expected properties: `Name` (title), `Status` (must be `Published`), `Date`,
-`Description`, `ReadTime`, `Tags`.
-
-Note that the script never deletes: unpublishing a post in Notion drops it from
-the listing but leaves its `.md` behind.
+`public/posts/` and `src/data/blog-posts.json` are generated files; edit the
+source folder instead. Deleted or draft articles are removed from generated
+output. Invalid metadata or unresolved wikilinks stop the sync without replacing
+the last successful output. Commit your Markdown changes and deploy to publish;
+the sitemap and share cards are rebuilt from the same local content.
 
 ## Projects
 
@@ -57,7 +70,7 @@ Posters keep the initial page load lightweight.
 
 ## SEO
 
-`npm run build` runs `make-sitemap.js` first, which writes `public/sitemap.xml`
+`npm run build` syncs local writing, then runs `make-sitemap.js`, which writes `public/sitemap.xml`
 and `public/robots.txt`. Routes come from `src/lib/nav.ts` and posts from
 `blog-posts.json`, so neither needs a second list kept in sync. Output carries no
 build timestamp, so an unchanged site rebuilds to an identical file.
@@ -102,5 +115,5 @@ until paused by clicking its cover on Home.
 
 Run `npm run lint`, `npm run format:check`, and `npm run build` before committing.
 `npm run format` applies the repository's formatting. Poster generation requires
-FFmpeg. Blog refresh requires network access and the Notion credentials above;
-normal development and builds use the checked-in content.
+FFmpeg. Writing sync, normal development, and builds use checked-in local content;
+no Notion account or credentials are needed.

@@ -591,9 +591,42 @@ h1 {
   outline: 2px solid #667d83;
   outline-offset: 5px;
 }
-.article-prose table {
-  display: block;
+.article-table-scroll {
+  margin-block: 1em 1.65em;
   overflow-x: auto;
+}
+.article-prose .article-table-scroll table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  color: var(--color-ink);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.article-prose .article-table-scroll :is(th, td) {
+  padding: 0.55em clamp(0.35rem, 1.6vw, 1rem);
+  vertical-align: baseline;
+}
+.article-prose .article-table-scroll :is(th, td):first-child {
+  padding-left: 0;
+  text-align: left;
+}
+.article-prose .article-table-scroll :is(th, td):last-child {
+  padding-right: 0;
+}
+.article-table-scroll th {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.article-table-scroll thead tr {
+  border-bottom: 1px solid var(--color-divider);
+}
+.article-table-scroll tbody tr {
+  border-bottom: 1px solid var(--color-border);
+}
+.article-table-scroll tbody tr:last-child {
+  border-bottom: 0;
 }
 .article-back {
   margin-top: 64px;

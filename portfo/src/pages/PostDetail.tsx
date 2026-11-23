@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
+import TinyDreamerExplorer, { explorerUrl } from "../components/TinyDreamerExplorer";
 import remarkGfm from "remark-gfm";
 import ReadingProgress from "../components/ReadingProgress";
 import SiteLink from "../components/SiteLink";
@@ -64,9 +68,17 @@ export default function PostDetail() {
           <div className="article-content">
             <div className="prose prose-neutral max-w-none article-prose">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={slug === "tiny-dreamer" ? [remarkGfm, remarkMath] : [remarkGfm]}
+                rehypePlugins={slug === "tiny-dreamer" ? [rehypeKatex] : []}
                 components={{
-                  a: ({ children, href }) => (
+                  table: ({ children }) => (
+                    <div className="article-table-scroll">
+                      <table>{children}</table>
+                    </div>
+                  ),
+                  a: ({ children, href }) => slug === "tiny-dreamer" && href === explorerUrl ? (
+                    <TinyDreamerExplorer />
+                  ) : (
                     <SiteLink href={href}>{children}</SiteLink>
                   ),
                   img: ({ src, alt }) => (

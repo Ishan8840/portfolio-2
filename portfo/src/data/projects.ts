@@ -14,17 +14,15 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    id: 4,
-    title: "deep dive into deep learning",
-    description:
-      "diving into the foundations of robot learning and reimplementing the core breakthroughs from scratch",
-    video: "/videos/deep-learning.mp4",
-    caption: "From pixels to action. Still learning.",
+    id: 5,
+    title: "TinyDreamer",
+    description: "a minimal, scaled-down implementation of Dreamer",
+    video: "/videos/tiny-dreamer.mp4",
+    caption: "Learning in imagination.",
     tech: [],
-    website: "https://ishan8840.github.io/deep-learning-notes/",
+    website: "/writing/tiny-dreamer",
     websiteLabel: "Notes",
-    github: "https://github.com/Ishan8840/deep-learning",
-    twitter: "https://x.com/IshanShahh/status/2118769130983551218",
+    github: "https://github.com/Ishan8840/tiny-dreamer",
   },
   {
     id: 3,
@@ -57,5 +55,18 @@ export const projects: Project[] = [
     tech: ["RL", "VLA", "JAX", "PyTorch"],
     website: "/writing/working-with-vlas-training-inference",
     websiteLabel: "Notes",
+  },
+  {
+    id: 4,
+    title: "deep dive into deep learning",
+    description:
+      "diving into the foundations of robot learning and reimplementing the core breakthroughs from scratch",
+    video: "/videos/deep-learning.mp4",
+    caption: "From pixels to action. Still learning.",
+    tech: [],
+    website: "https://ishan8840.github.io/deep-learning-notes/",
+    websiteLabel: "Notes",
+    github: "https://github.com/Ishan8840/deep-learning",
+    twitter: "https://x.com/IshanShahh/status/2118769130983551218",
   },
 ];
