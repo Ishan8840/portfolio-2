@@ -23,6 +23,7 @@ export const projects: Project[] = [
     website: "/writing/tiny-dreamer",
     websiteLabel: "Notes",
     github: "https://github.com/Ishan8840/tiny-dreamer",
+    twitter: "https://x.com/IshanShahh/status/2124925949385093412",
   },
   {
     id: 3,
